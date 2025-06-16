@@ -1,0 +1,31 @@
+[part='tree'] {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+[part='item'] {
+  align-items: center;
+  display: grid;
+  gap: 0.4em 0.6ch;
+  grid-template-areas:
+    "toggle label"
+    "tree   tree";
+  grid-template-columns: 1em 1fr;
+}
+
+[part='toggle'] {
+  grid-area: toggle;
+}
+
+[part='label'] {
+  align-items: inherit;
+  display: flex;
+  gap: inherit;
+  grid-area: label;
+}
+
+:where([part='item']) [part='tree'] {
+  grid-area: tree;
+  padding-inline-start: 1em;
+}
