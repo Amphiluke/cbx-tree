@@ -86,7 +86,7 @@ export default class CbxTree extends HTMLElement {
     this.#render();
 
     this.#shadowRoot.addEventListener('change', ({target}) => {
-      const id = target.dataset.itemId;
+      const id = target.id.slice(4); // drop the prefix “cbx_”
       const method = target.checked ? 'add' : 'delete';
       this.#selection[method](id);
       const item = this.#getItem(id);
@@ -131,7 +131,7 @@ export default class CbxTree extends HTMLElement {
    */
   #buildTree(rawTree, parentId) {
     return new Map(rawTree.map((rawItem, index) => {
-      const id = parentId ? `${parentId}\0${index}` : String(index);
+      const id = parentId ? `${parentId}:${index}` : String(index);
       if (rawItem.checked) {
         this.#selection.add(id);
       }
@@ -164,8 +164,8 @@ export default class CbxTree extends HTMLElement {
    * @returns {CbxTreeItem | undefined}
    */
   #getItem(id) {
-    const parts = id.split('\0');
-    return parts.slice(1).reduce((item, part) => item?.children?.get(`${item?.id}\0${part}`), this.#tree.get(parts[0]));
+    const parts = id.split(':');
+    return parts.slice(1).reduce((item, part) => item?.children?.get(`${item?.id}:${part}`), this.#tree.get(parts[0]));
   }
 
   /**
@@ -195,9 +195,12 @@ export default class CbxTree extends HTMLElement {
     if (this.#tree.has(item.id)) { // top-level item
       return;
     }
-    const parentItem = this.#getItem(item.id.slice(0, item.id.lastIndexOf('\0')));
-    const method = this.#calcItemState(parentItem) === 'checked' ? 'add' : 'delete';
-    this.#selection[method](parentItem.id);
+    const parentItem = this.#getItem(item.id.slice(0, item.id.lastIndexOf(':')));
+    const state = this.#calcItemState(parentItem);
+    this.#selection[state === 'checked' ? 'add' : 'delete'](parentItem.id);
+    const checkbox = this.#shadowRoot.getElementById(`cbx_${parentItem.id}`);
+    checkbox.checked = state === 'checked';
+    checkbox.indeterminate = state === 'indeterminate';
     this.#syncAncestors(parentItem);
   }
 
@@ -209,9 +212,13 @@ export default class CbxTree extends HTMLElement {
     if (!item.children) {
       return;
     }
-    const method = this.#selection.has(item.id) ? 'add' : 'delete';
+    const isChecked = this.#selection.has(item.id);
+    const method = isChecked ? 'add' : 'delete';
     item.children.forEach((childItem, id) => {
       this.#selection[method](id);
+      const checkbox = this.#shadowRoot.getElementById(`cbx_${id}`);
+      checkbox.checked = isChecked;
+      checkbox.indeterminate = false;
       this.#syncDescendants(childItem);
     });
   }

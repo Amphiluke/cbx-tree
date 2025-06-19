@@ -21,7 +21,7 @@ export const itemTemplate = ({id, value, title, icon, children}) => `
 <li part="item">
   ${(children?.size > 0) ? '<button type="button" part="toggle"></button>' : ''}
   <label part="label">
-    <input type="checkbox" value="${sanitize(value)}" data-item-id="${id}" part="checkbox">
+    <input type="checkbox" id="cbx_${id}" value="${sanitize(value)}" part="checkbox">
     ${icon ? `<img src="${sanitize(icon)}" alt="" part="icon">` : ''}
     <span part="title">${title}</span>
   </label>
