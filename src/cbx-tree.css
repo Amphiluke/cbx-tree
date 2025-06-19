@@ -1,3 +1,7 @@
+:host(:not([hidden])) {
+  display: block;
+}
+
 [part='tree'] {
   list-style: none;
   margin: 0;
@@ -12,10 +16,34 @@
     "toggle label"
     "tree   tree";
   grid-template-columns: 1em 1fr;
+
+  &[aria-expanded='false'] > [part='tree'] {
+    display: none;
+  }
 }
 
 [part='toggle'] {
+  --toggle-closed: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 14" width="8" height="14"><path d="M1.5 2.5v9L7 7z"/></svg>');
+  --toggle-opened: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 8" width="14" height="8"><path d="M2.5 1.5h9L7 7z"/></svg>');
+  background: #0000 var(--toggle-closed) 50% 50% no-repeat;
+  border: none;
+  cursor: pointer;
+  font: inherit;
   grid-area: toggle;
+  height: 1em;
+  padding: 0;
+  position: relative;
+  width: 1em;
+
+  [aria-expanded='true'] > & {
+    background-image: var(--toggle-opened);
+  }
+
+  &::before {
+    content: '';
+    inset: -4px;
+    position: absolute;
+  }
 }
 
 [part='label'] {

@@ -9,7 +9,7 @@ stylesheet.replaceSync(css);
  * Raw data for a single item of the tree
  * @typedef {object} CbxRawTreeItem
  * @property {string} title - Item title
- * @property {string} value - Item checkbox’s value, must be unique within the entire tree
+ * @property {string} value - Item checkbox’s value
  * @property {boolean} [checked] - Item selection state
  * @property {string} [icon] - Item icon’s URL
  * @property {CbxRawTreeItem[] | null} [children] - A list of child items, or `null` if subtree isn’t fetched yet
@@ -19,7 +19,7 @@ stylesheet.replaceSync(css);
  * Internal representation for a single item of the tree
  * @typedef {object} CbxTreeItem
  * @property {string} id - Item identifier, unique within the entire tree
- * @property {string} value - Item checkbox’s value, must be unique within the entire tree
+ * @property {string} value - Item checkbox’s value
  * @property {string} title - Item title
  * @property {string} [icon] - Item icon’s URL
  * @property {CbxTreeMap | null} [children] - A map of child items, or `null` if subtree isn’t fetched yet
@@ -85,15 +85,8 @@ export default class CbxTree extends HTMLElement {
     this.#tree = this.#buildTree(this.#getDefaultRawTree());
     this.#render();
 
-    this.#shadowRoot.addEventListener('change', ({target}) => {
-      const id = target.id.slice(4); // drop the prefix “cbx_”
-      const method = target.checked ? 'add' : 'delete';
-      this.#selection[method](id);
-      const item = this.#getItem(id);
-      this.#syncAncestors(item);
-      this.#syncDescendants(item);
-      this.#internals.setFormValue(this.formData, JSON.stringify([...this.#tree]));
-    });
+    this.#shadowRoot.addEventListener('change', (e) => this.#onChange(e));
+    this.#shadowRoot.addEventListener('click', (e) => this.#onItemToggle(e));
   }
 
 
@@ -117,10 +110,41 @@ export default class CbxTree extends HTMLElement {
   }
 
 
+  // === Event listeners ===
+
+  #onChange({target}) {
+    if (!target.part.contains('checkbox')) {
+      return;
+    }
+    const id = target.id.slice(4); // drop the prefix “cbx_”
+    const method = target.checked ? 'add' : 'delete';
+    this.#selection[method](id);
+    const item = this.#getItem(id);
+    // Order of synchronisation matters (descendants first, then ancestors)
+    this.#syncDescendants(item);
+    this.#syncAncestors(item);
+    this.#internals.setFormValue(this.formData, JSON.stringify([...this.#tree]));
+  }
+
+  #onItemToggle({target}) {
+    if (!target.part.contains('toggle')) {
+      return;
+    }
+    const treeItem = target.closest('[role="treeitem"]');
+    treeItem.ariaExpanded = treeItem.ariaExpanded === 'true' ? 'false' : 'true';
+  }
+
+
   // === Internals ===
 
   #render() {
     this.#shadowRoot.setHTMLUnsafe(treeTemplate(this.#tree));
+    const checkboxes = this.#shadowRoot.querySelectorAll('input[part="checkbox"]');
+    [...checkboxes].forEach((checkbox) => {
+      const state = this.#getItem(checkbox.id.slice(4))?.state;
+      checkbox.checked = state === 'checked';
+      checkbox.indeterminate = state === 'indeterminate';
+    });
   }
 
   /**
@@ -188,23 +212,6 @@ export default class CbxTree extends HTMLElement {
   }
 
   /**
-   * Sync selection states of the item’s ancestors
-   * @param {CbxTreeItem} item 
-   */
-  #syncAncestors(item) {
-    if (this.#tree.has(item.id)) { // top-level item
-      return;
-    }
-    const parentItem = this.#getItem(item.id.slice(0, item.id.lastIndexOf(':')));
-    const state = this.#calcItemState(parentItem);
-    this.#selection[state === 'checked' ? 'add' : 'delete'](parentItem.id);
-    const checkbox = this.#shadowRoot.getElementById(`cbx_${parentItem.id}`);
-    checkbox.checked = state === 'checked';
-    checkbox.indeterminate = state === 'indeterminate';
-    this.#syncAncestors(parentItem);
-  }
-
-  /**
    * Sync selection states of the item’s descendants
    * @param {CbxTreeItem} item 
    */
@@ -221,6 +228,23 @@ export default class CbxTree extends HTMLElement {
       checkbox.indeterminate = false;
       this.#syncDescendants(childItem);
     });
+  }
+
+  /**
+   * Sync selection states of the item’s ancestors
+   * @param {CbxTreeItem} item 
+   */
+  #syncAncestors(item) {
+    if (this.#tree.has(item.id)) { // top-level item
+      return;
+    }
+    const parentItem = this.#getItem(item.id.slice(0, item.id.lastIndexOf(':')));
+    const state = this.#calcItemState(parentItem);
+    this.#selection[state === 'checked' ? 'add' : 'delete'](parentItem.id);
+    const checkbox = this.#shadowRoot.getElementById(`cbx_${parentItem.id}`);
+    checkbox.checked = state === 'checked';
+    checkbox.indeterminate = state === 'indeterminate';
+    this.#syncAncestors(parentItem);
   }
 
   /** @returns {CbxRawTreeItem[]} */
