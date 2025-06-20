@@ -6,7 +6,7 @@ stylesheet.replaceSync(css);
 
 
 /**
- * Raw data for a single item of the tree
+ * Raw user-defined data for a single item of the tree
  * @typedef {object} CbxRawTreeItem
  * @property {string} title - Item title
  * @property {string} value - Item checkbox’s value
@@ -52,7 +52,12 @@ export default class CbxTree extends HTMLElement {
   get formData() {
     const data = new FormData();
     const {name} = this;
-    this.#selection.forEach((value) => data.append(name, value));
+    this.#selection.forEach((id) => {
+      const value = this.#getItem(id)?.value;
+      if (value !== undefined) {
+        data.append(name, value);
+      }
+    });
     return data;
   }
 
@@ -65,6 +70,17 @@ export default class CbxTree extends HTMLElement {
   }
   set name(value) {
     this.setAttribute('name', value);
+  }
+
+  get disabled() {
+    return this.hasAttribute('disabled');
+  }
+  set disabled(value) {
+    if (value) {
+      this.setAttribute('disabled', value);
+    } else {
+      this.removeAttribute('disabled');
+    }
   }
 
   get type() {
@@ -82,8 +98,9 @@ export default class CbxTree extends HTMLElement {
     this.#shadowRoot.adoptedStyleSheets = [stylesheet];
 
     this.#internals = this.attachInternals();
-    this.#tree = this.#buildTree(this.#getDefaultRawTree());
-    this.#render();
+
+    this.setData(this.#getDefaultRawTree());
+    this.#internals.setFormValue(this.formData, JSON.stringify(this));
 
     this.#shadowRoot.addEventListener('change', (e) => this.#onChange(e));
     this.#shadowRoot.addEventListener('click', (e) => this.#onItemToggle(e));
@@ -92,9 +109,13 @@ export default class CbxTree extends HTMLElement {
 
   // === Lifecycle callbacks ===
 
+  formDisabledCallback(disabled) {
+    const controls = this.#shadowRoot.querySelectorAll('button, input');
+    [...controls].forEach((ctrl) => ctrl.disabled = disabled);
+  }
+
   formResetCallback() {
-    this.#tree = this.#buildTree(this.#getDefaultRawTree());
-    this.#render();
+    this.setData(this.#getDefaultRawTree());
   }
   
   formStateRestoreCallback(state, mode) {
@@ -102,8 +123,7 @@ export default class CbxTree extends HTMLElement {
       return;
     }
     try {
-      this.#tree = new Map(JSON.parse(state)); // TODO sync selection
-      this.#render();
+      this.setData(JSON.parse(state));
     } catch (e) {
       console.warn('Failed to restore the tree state', e);
     }
@@ -123,7 +143,7 @@ export default class CbxTree extends HTMLElement {
     // Order of synchronisation matters (descendants first, then ancestors)
     this.#syncDescendants(item);
     this.#syncAncestors(item);
-    this.#internals.setFormValue(this.formData, JSON.stringify([...this.#tree]));
+    this.#internals.setFormValue(this.formData, JSON.stringify(this));
   }
 
   #onItemToggle({target}) {
@@ -262,6 +282,21 @@ export default class CbxTree extends HTMLElement {
     }
   }
 
+  /**
+   * Convert internal representation of a tree back to its raw format
+   * @param {CbxTreeMap} tree
+   * @returns {CbxRawTreeItem[]}
+   */
+  #toRaw(tree = this.#tree) {
+    return [...tree.values()].map((item) => ({
+      title: item.title,
+      value: item.value,
+      checked: this.#selection.has(item.id),
+      icon: item.icon,
+      children: item.children ? this.#toRaw(item.children) : item.children,
+    }));
+  }
+
 
   // === Public interface ===
 
@@ -273,13 +308,13 @@ export default class CbxTree extends HTMLElement {
     if (!Array.isArray(treeData)) {
       throw new TypeError('Tree data must be an array of tree items');
     }
-    this.#tree = this.#buildTree(treeData); // TODO sync selection
+    this.#selection.clear();
+    this.#tree = this.#buildTree(treeData);
     this.#render();
   }
 
   toJSON() {
-    // TODO Convert to raw format!
-    return structuredClone(this.#tree);
+    return this.#toRaw();
   }
 
 

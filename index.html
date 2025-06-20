@@ -16,7 +16,7 @@
         First
         <input type="text" name="first">
       </label>
-      <cbx-tree name="tree">
+      <cbx-tree name="tree[]">
         <script type="application/json">
           [
             {
@@ -30,19 +30,19 @@
                   "icon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M0 0L16 0 16 16 0 16z' fill='rebeccapurple'/></svg>",
                   "children": [
                     {
-                      "value": "1a'",
-                      "title": "Item #1a'",
+                      "value": "1a*",
+                      "title": "Item #1a*",
                       "icon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M0 8a8 8 0 1 1 0 .01z' fill='coral'/></svg>"
                     },
                     {
-                      "value": "1a''",
-                      "title": "Item #1a''",
+                      "value": "1a**",
+                      "title": "Item #1a**",
                       "icon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M0 8a8 8 0 1 1 0 .01z' fill='forestgreen'/></svg>",
                       "checked": true
                     },
                     {
-                      "value": "1a'''",
-                      "title": "Item #1a'''",
+                      "value": "1a***",
+                      "title": "Item #1a***",
                       "icon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M0 8a8 8 0 1 1 0 .01z' fill='deepskyblue'/></svg>"
                     }
                   ]
@@ -53,13 +53,13 @@
                   "icon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M0 0L16 0 16 16 0 16z' fill='peru'/></svg>",
                   "children": [
                     {
-                      "value": "1b'",
-                      "title": "Item #1b'",
+                      "value": "1b*",
+                      "title": "Item #1b*",
                       "icon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M0 8a8 8 0 1 1 0 .01z' fill='seagreen'/></svg>"
                     },
                     {
-                      "value": "1b''",
-                      "title": "Item #1b''",
+                      "value": "1b**",
+                      "title": "Item #1b**",
                       "icon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M0 8a8 8 0 1 1 0 .01z' fill='silver'/></svg>"
                     }
                   ]
@@ -82,18 +82,18 @@
                   "icon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M0 0L16 0 16 16 0 16z' fill='lime'/></svg>",
                   "children": [
                     {
-                      "value": "3a'",
-                      "title": "Item #3a'",
+                      "value": "3a*",
+                      "title": "Item #3a*",
                       "icon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M0 8a8 8 0 1 1 0 .01z' fill='black'/></svg>"
                     },
                     {
-                      "value": "3a''",
-                      "title": "Item #3a''",
+                      "value": "3a**",
+                      "title": "Item #3a**",
                       "icon": null
                     },
                     {
-                      "value": "3a'''",
-                      "title": "Item #3a'''",
+                      "value": "3a***",
+                      "title": "Item #3a***",
                       "icon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M0 8a8 8 0 1 1 0 .01z' fill='sandybrown'/></svg>"
                     }
                   ]
@@ -104,14 +104,14 @@
                   "icon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M0 0L16 0 16 16 0 16z' fill='blue'/></svg>",
                   "children": [
                     {
-                      "value": "3b'",
-                      "title": "Item #3b'",
+                      "value": "3b*",
+                      "title": "Item #3b*",
                       "icon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M0 8a8 8 0 1 1 0 .01z' fill='olive'/></svg>",
                       "checked": true
                     },
                     {
-                      "value": "3b''",
-                      "title": "Item #3b''",
+                      "value": "3b**",
+                      "title": "Item #3b**",
                       "icon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M0 8a8 8 0 1 1 0 .01z' fill='maroon'/></svg>",
                       "checked": true
                     }
@@ -127,6 +127,7 @@
         <input type="text" name="last">
       </label><br>
       <button type="submit">Go</button>
+      <button type="reset">Reset</button>
     </form>
     <script type="module" src="/src/cbx-tree.mjs"></script>
   </body>

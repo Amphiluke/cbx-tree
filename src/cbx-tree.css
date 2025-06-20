@@ -28,7 +28,6 @@
   background: currentColor;
   border: none;
   color: inherit;
-  cursor: pointer;
   font: inherit;
   grid-area: toggle;
   height: 1em;
@@ -36,6 +35,10 @@
   padding: 0;
   position: relative;
   width: 1em;
+
+  &:not(:disabled) {
+    cursor: pointer;
+  }
 
   [aria-expanded='true'] > & {
     mask-image: var(--toggle-opened);
