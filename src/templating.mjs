@@ -19,7 +19,7 @@ export const treeTemplate = (tree, isRoot = true) => `
  * @returns {string}
  */
 export const itemTemplate = ({id, title, icon, children}) => `
-<li part="item" role="treeitem" ${children?.size ? ' aria-expanded="true"' : (children ? ' aria-expanded="false"' : '')}>
+<li id="item_${id}" part="item" role="treeitem" aria-expanded="${children?.size ? 'true' : (children ? 'false' : 'undefined')}">
   ${(children !== undefined) ? '<button type="button" part="toggle"></button>' : ''}
   <label part="label">
     <input type="checkbox" id="cbx_${id}" part="checkbox">

@@ -1,4 +1,5 @@
 import {treeTemplate} from './templating.mjs';
+import {unprefixId, assertRawTreeValid} from './helpers.mjs';
 import css from './cbx-tree.css?inline';
 
 const stylesheet = new CSSStyleSheet();
@@ -48,6 +49,9 @@ export default class CbxTree extends HTMLElement {
   /** @type {Set<string>} */
   #selection = new Set();
 
+  /** @type {((parentValue: string) => Promise<CbxRawTreeItem[]>) | null} */
+  subtreeProvider = null;
+
 
   get formData() {
     const data = new FormData();
@@ -91,16 +95,16 @@ export default class CbxTree extends HTMLElement {
   constructor() {
     super();
 
-    this.#shadowRoot = this.attachShadow({
-      mode: 'open',
-      delegatesFocus: true, // required for proper hinting when form validation fails
-    });
+    this.#shadowRoot = this.attachShadow({mode: 'open'});
     this.#shadowRoot.adoptedStyleSheets = [stylesheet];
 
     this.#internals = this.attachInternals();
 
     this.setData(this.#getDefaultRawTree());
-    this.#internals.setFormValue(this.formData, JSON.stringify(this));
+
+    if (!this.hasAttribute('tabindex')) {
+      this.tabIndex = 0; // the element must be focusable for proper hinting when form validation fails
+    }
 
     this.#shadowRoot.addEventListener('change', (e) => this.#onChange(e));
     this.#shadowRoot.addEventListener('click', (e) => this.#onItemToggle(e));
@@ -136,22 +140,26 @@ export default class CbxTree extends HTMLElement {
     if (!target.part.contains('checkbox')) {
       return;
     }
-    const id = target.id.slice(4); // drop the prefix “cbx_”
+    const id = unprefixId(target.id);
     const method = target.checked ? 'add' : 'delete';
     this.#selection[method](id);
     const item = this.#getItem(id);
     // Order of synchronisation matters (descendants first, then ancestors)
     this.#syncDescendants(item);
     this.#syncAncestors(item);
-    this.#internals.setFormValue(this.formData, JSON.stringify(this));
+    const data = this.formData;
+    this.#internals.setFormValue(data, JSON.stringify(this));
+    // N.B.: According to spec, setFormValue() clones FormData so it’s safe to pass data by reference in event’s detail
+    this.dispatchEvent(new CustomEvent('cbxtreechange', {bubbles: true, detail: data}));
   }
 
   #onItemToggle({target}) {
     if (!target.part.contains('toggle')) {
       return;
     }
-    const treeItem = target.closest('[role="treeitem"]');
-    treeItem.ariaExpanded = treeItem.ariaExpanded === 'true' ? 'false' : 'true';
+    const itemElement = target.closest('[part="item"]');
+    itemElement.ariaExpanded = itemElement.ariaExpanded === 'true' ? 'false' : 'true';
+    this.#requestSubtree(unprefixId(itemElement.id));
   }
 
 
@@ -159,9 +167,9 @@ export default class CbxTree extends HTMLElement {
 
   #render() {
     this.#shadowRoot.setHTMLUnsafe(treeTemplate(this.#tree));
-    const checkboxes = this.#shadowRoot.querySelectorAll('input[part="checkbox"]');
+    const checkboxes = this.#shadowRoot.querySelectorAll('[part="checkbox"]');
     [...checkboxes].forEach((checkbox) => {
-      const state = this.#getItem(checkbox.id.slice(4))?.state;
+      const state = this.#getItem(unprefixId(checkbox.id))?.state;
       checkbox.checked = state === 'checked';
       checkbox.indeterminate = state === 'indeterminate';
     });
@@ -170,7 +178,7 @@ export default class CbxTree extends HTMLElement {
   /**
    * Convert raw tree data to internal tree representation
    * @param {CbxRawTreeItem[]} rawTree - Raw tree data
-   * @param {string} parentId - Identifier of a parent item (for recursive calls only)
+   * @param {string} parentId - Identifier of a parent item (the case of building a subtree)
    * @returns {CbxTreeMap}
    */
   #buildTree(rawTree, parentId) {
@@ -200,6 +208,31 @@ export default class CbxTree extends HTMLElement {
       });
       return [id, item];
     }));
+  }
+
+  async #requestSubtree(parentId) {
+    if (typeof this.subtreeProvider !== 'function') {
+      return;
+    }
+    const parentItem = this.#getItem(parentId);
+    if (parentItem?.children !== null) {
+      return;
+    }
+    const itemElement = this.#shadowRoot.getElementById(`item_${parentId}`);
+    itemElement.inert = true;
+    try {
+      const subtree = await this.subtreeProvider(parentItem.value);
+      assertRawTreeValid(subtree);
+      parentItem.children = this.#buildTree(subtree, parentItem.id);
+    } finally {
+      itemElement.inert = false;
+    }
+    if (!parentItem.children.size) {
+      return;
+    }
+    itemElement.insertAdjacentHTML('beforeend', treeTemplate(parentItem.children, false));
+    this.#syncDescendants(parentItem);
+    this.#internals.setFormValue(this.formData, JSON.stringify(this));
   }
 
   /**
@@ -272,9 +305,7 @@ export default class CbxTree extends HTMLElement {
     const contentJSON = this.textContent.trim() || '[]';
     try {
       const tree = JSON.parse(contentJSON);
-      if (!Array.isArray(tree)) {
-        throw new TypeError();
-      }
+      assertRawTreeValid(tree);
       return tree;
     } catch {
       console.error(new DOMException('<cbx-tree> contents must be a valid JSON array representation', 'DataError'));
@@ -305,12 +336,11 @@ export default class CbxTree extends HTMLElement {
    * @param {CbxRawTreeItem[]} treeData 
    */
   setData(treeData) {
-    if (!Array.isArray(treeData)) {
-      throw new TypeError('Tree data must be an array of tree items');
-    }
+    assertRawTreeValid(treeData);
     this.#selection.clear();
     this.#tree = this.#buildTree(treeData);
     this.#render();
+    this.#internals.setFormValue(this.formData, JSON.stringify(this));
   }
 
   toJSON() {

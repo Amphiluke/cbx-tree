@@ -8,6 +8,13 @@
       html {
         color-scheme: light dark;
       }
+      .trees {
+        display: grid;
+        gap: 1em;
+        grid-template-columns: 1fr 1fr;
+        margin-block: 1em;
+        width: fit-content;
+      }
     </style>
   </head>
   <body>
@@ -16,112 +23,9 @@
         First
         <input type="text" name="first">
       </label>
-      <cbx-tree name="tree[]">
-        <script type="application/json">
-          [
-            {
-              "value": "1",
-              "title": "Item #1",
-              "icon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M0 0L16 8 0 16z' fill='orchid'/></svg>",
-              "children": [
-                {
-                  "value": "1a",
-                  "title": "Item #1a",
-                  "icon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M0 0L16 0 16 16 0 16z' fill='rebeccapurple'/></svg>",
-                  "children": [
-                    {
-                      "value": "1a*",
-                      "title": "Item #1a*",
-                      "icon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M0 8a8 8 0 1 1 0 .01z' fill='coral'/></svg>"
-                    },
-                    {
-                      "value": "1a**",
-                      "title": "Item #1a**",
-                      "icon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M0 8a8 8 0 1 1 0 .01z' fill='forestgreen'/></svg>",
-                      "checked": true
-                    },
-                    {
-                      "value": "1a***",
-                      "title": "Item #1a***",
-                      "icon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M0 8a8 8 0 1 1 0 .01z' fill='deepskyblue'/></svg>"
-                    }
-                  ]
-                },
-                {
-                  "value": "1b",
-                  "title": "Item #1b",
-                  "icon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M0 0L16 0 16 16 0 16z' fill='peru'/></svg>",
-                  "children": [
-                    {
-                      "value": "1b*",
-                      "title": "Item #1b*",
-                      "icon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M0 8a8 8 0 1 1 0 .01z' fill='seagreen'/></svg>"
-                    },
-                    {
-                      "value": "1b**",
-                      "title": "Item #1b**",
-                      "icon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M0 8a8 8 0 1 1 0 .01z' fill='silver'/></svg>"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "value": "2",
-              "title": "Item #2",
-              "children": null
-            },
-            {
-              "value": "3",
-              "title": "Item #3",
-              "icon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M0 0L16 8 0 16z' fill='navy'/></svg>",
-              "children": [
-                {
-                  "value": "3a",
-                  "title": "Item #3a",
-                  "icon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M0 0L16 0 16 16 0 16z' fill='lime'/></svg>",
-                  "children": [
-                    {
-                      "value": "3a*",
-                      "title": "Item #3a*",
-                      "icon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M0 8a8 8 0 1 1 0 .01z' fill='black'/></svg>"
-                    },
-                    {
-                      "value": "3a**",
-                      "title": "Item #3a**",
-                      "icon": null
-                    },
-                    {
-                      "value": "3a***",
-                      "title": "Item #3a***",
-                      "icon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M0 8a8 8 0 1 1 0 .01z' fill='sandybrown'/></svg>"
-                    }
-                  ]
-                },
-                {
-                  "value": "3b",
-                  "title": "Item #3b",
-                  "icon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M0 0L16 0 16 16 0 16z' fill='blue'/></svg>",
-                  "children": [
-                    {
-                      "value": "3b*",
-                      "title": "Item #3b*",
-                      "icon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M0 8a8 8 0 1 1 0 .01z' fill='olive'/></svg>",
-                      "checked": true
-                    },
-                    {
-                      "value": "3b**",
-                      "title": "Item #3b**",
-                      "icon": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M0 8a8 8 0 1 1 0 .01z' fill='maroon'/></svg>",
-                      "checked": true
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        </script>
-      </cbx-tree>
+      <div class="trees">
+        <cbx-tree name="tree[]"></cbx-tree>
+      </div>
       <label>
         Last
         <input type="text" name="last">
@@ -130,5 +34,36 @@
       <button type="reset">Reset</button>
     </form>
     <script type="module" src="/src/cbx-tree.mjs"></script>
+    <script type="module">
+      const createItem = () => {
+        const value = String(Math.random()).slice(2);
+        const path = ['M0 0L16 8 0 16z', 'M0 0L16 0 16 16 0 16z', 'M0 8a8 8 0 1 1 0 .01z'][Math.floor(Math.random() * 3)];
+        const color = `rgb(${Math.floor(Math.random() * 256)} ${Math.floor(Math.random() * 256)} ${Math.floor(Math.random() * 256)})`;
+        return {
+          value,
+          title: `Item “${value}”`,
+          checked: Math.random() > 0.5,
+          icon: `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='${path}' fill='${color}'/></svg>`,
+          children: Math.random() > 0.5 ? null : undefined,
+        };
+      };
+      const subtreeProvider = async (value) => {
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+        const isTopLevel = /^\d+$/.test(value);
+        return [createItem(), createItem(), createItem()];
+      };
+      customElements.whenDefined('cbx-tree').then(() => {
+        const cbxTree = document.querySelector('[name="tree[]"]');
+        cbxTree.setData([createItem(), {...createItem(), children: [createItem(), createItem()]}, createItem()]);
+        cbxTree.insertAdjacentHTML('afterend', `
+          <cbx-tree name="tree2[]">
+            <script type="application/json">
+              ${JSON.stringify([createItem(), createItem(), {...createItem(), children: [createItem(), createItem()]}])}
+            <\/script>
+          </cbx-tree>
+        `);
+        cbxTree.subtreeProvider = document.querySelector('[name="tree2[]"]').subtreeProvider = subtreeProvider;
+      });
+    </script>
   </body>
 </html>

@@ -6,6 +6,10 @@
   list-style: none;
   margin: 0;
   padding: 0;
+
+  &:has([inert]) {
+    cursor: progress;
+  }
 }
 
 [part='item'] {
@@ -15,7 +19,7 @@
   grid-template-areas:
     "toggle label"
     "tree   tree";
-  grid-template-columns: 1em 1fr;
+  grid-template-columns: max(1em, 16px) 1fr;
 
   &[aria-expanded='false'] > [part='tree'] {
     display: none;
@@ -25,16 +29,17 @@
 [part='toggle'] {
   --toggle-closed: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 14" width="8" height="14"><path d="M1.5 2.5v9L7 7z"/></svg>');
   --toggle-opened: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 8" width="14" height="8"><path d="M2.5 1.5h9L7 7z"/></svg>');
+  --toggle-pending: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" width="14" height="14"><path d="M7 1A6 6 0 1 1 1 7" fill="none" stroke="black" stroke-width="2"><animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0 7 7" to="360 7 7" dur="1s" repeatCount="indefinite"/></path></svg>');
   background: currentColor;
   border: none;
   color: inherit;
   font: inherit;
   grid-area: toggle;
-  height: 1em;
-  mask: var(--toggle-closed) 50% 50% no-repeat;
+  height: max(1em, 16px);
+  mask: var(--toggle-closed) 50% 50% / contain no-repeat;
   padding: 0;
   position: relative;
-  width: 1em;
+  width: max(1em, 16px);
 
   &:not(:disabled) {
     cursor: pointer;
@@ -42,6 +47,10 @@
 
   [aria-expanded='true'] > & {
     mask-image: var(--toggle-opened);
+  }
+
+  [inert] > & {
+    mask-image: var(--toggle-pending);
   }
 
   &::before {
