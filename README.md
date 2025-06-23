@@ -88,9 +88,9 @@ The first way is to provide tree data directly in HTML by adding JSON content as
 ```
 
 > [!NOTE]
-> Similarly to the `<textarea>` content, the data you provide in HTML is only used as a *default value*. In other words, dynamic updates of the HTML content don’t affect the current tree. To update the tree dynamically, one should use the [JavaScript API](#setdata) provided by the component.
+> Similarly to the `<textarea>` content, the data you provide in HTML is only used as a *default value*. In other words, dynamic updates of the HTML content don’t affect the current tree. To update the tree dynamically, one should use the [JavaScript API](#cbxtreesetdata) provided by the component.
 
-The second option is to fill the initial tree programmatically using the [`setData()`](#setdata) method.
+The second option is to fill the initial tree programmatically using the [`setData()`](#cbxtreesetdata) method.
 
 **HTML:**
 
@@ -153,19 +153,23 @@ customElements.whenDefined('cbx-tree').then(() => {
 
 As shown in the examples above, the tree is initialised with an array of objects representing the tree’s root items. Each item can have children forming a nested subtree. The table below provides information about the properties that can be specified for tree items at any nesting level.
 
-| Property   | Type            | Required | Description                                                       |
-| ---------- | --------------- | -------- | ----------------------------------------------------------------- |
-| `title`    | string          | yes      | Text label of the tree item                                       |
-| `value`    | string          | yes      | Internal value identifying the checked item in the submitted data |
-| `checked`  | boolean         | no       | Initial state of the item selection                               |
-| `icon`     | string          | no       | Item icons’s URL                                                  |
-| `children` | array or `null` | no       | Nested subtree items                                              |
+| Property   | Type             | Required | Description                                                       |
+| ---------- | ---------------- | -------- | ----------------------------------------------------------------- |
+| `title`    | string           | yes      | Text label of the tree item                                       |
+| `value`    | string           | yes      | Internal value identifying the checked item in the submitted data |
+| `checked`  | boolean          | no       | Initial state of the item selection                               |
+| `icon`     | string           | no       | Item icons’s URL                                                  |
+| `children` | array or `null`¹ | no       | Nested subtree items                                              |
 
-The value `null` of the `children` property is used for [on-demand loading of the subtree](#subtreeprovider).
+¹ <small>The value `null` of the `children` property is used for [on-demand loading of the subtree](#cbxtreesubtreeprovider).</small>
 
 ## Attributes
 
 This element includes the [global attributes](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Global_attributes).
+
+### `disabled`
+
+Applying this Boolean attribute turns all interactive controls within the tree into the disabled state. Items in the disabled tree cannot be collapsed or expanded by the user, and states of the checkboxes cannot be changed via the GUI.
 
 ### `name`
 
@@ -175,9 +179,74 @@ A mandatory attribute `name` is used by the `<cbx-tree>` component to construct 
 <cbx-tree name="reading-list[]"></cbx-tree>
 ```
 
-### `disabled`
+## Instance properties
 
-Applying this Boolean attribute turns all interactive controls within the tree into the disabled state. Items in the disabled tree cannot be collapsed or expanded by the user, and states of the checkboxes cannot be changed via the GUI.
+The `CbxTree` interface also inherits properties from its parent, [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement).
+
+Validation-related properties [`validity`](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals/validity), [`validationMessage`](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals/validationMessage), and [`willValidate`](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals/willValidate) are transparently exposed from the underlying `ElementInternals` object which allows the `<cbx-tree>` element participate in form validation.
+
+### `CbxTree.disabled`
+
+Reflects the value of the element’s [`disabled` attribute](#disabled).
+
+### `CbxTree.form`
+
+The read-only property that references the `HTMLFormElement` associated with this element.
+
+### `CbxTree.formData`
+
+A [`FormData`](https://developer.mozilla.org/en-US/docs/Web/API/FormData) object which contains key-value pairs of the currently checked items in the tree. Note that the element’s [`name` attribute](#name) is used for all keys, so the `FormData` object represents an array of checked values. The property is read-only.
+
+```javascript
+const readingList = document.querySelector('[name="reading-list[]"]');
+console.log('Checked values:', readingList.formData.getAll('reading-list[]'));
+```
+
+### `CbxTree.name`
+
+Reflects the value of the element’s [`name` attribute](#name).
+
+### `CbxTree.subtreeProvider`
+
+The `subtreeProvider` property is used in cases where on-demand subtree loading is required. If your initial tree doesn’t contain data for some nested subtrees, you may define your custom function for subtree generation/fetching which will be called when the user expands the target item for the first time.
+
+> [!IMPORTANT]
+> The items that allow on-demand loading, should have their `children` property set to `null` initially.
+
+The custom subtree provider is a function that accepts the value of the target item as its argument and returns a promise that resolves with an array representing a [subtree data](#tree-data-structure) for this specific item.
+
+```javascript
+customElements.whenDefined('cbx-tree').then(() => {
+  const readingList = document.querySelector('[name="reading-list[]"]');
+  readingList.subtreeProvider = async (itemValue) => {
+    const response = await fetch(`/reading-list/items/${itemValue}`);
+    return (await response.json()).children;
+  };
+});
+```
+
+### `CbxTree.type`
+
+A read-only property provided for consistency with browser-provided form controls. The same as [`Element.localName`](https://developer.mozilla.org/en-US/docs/Web/API/Element/localName).
+
+## Instance methods
+
+The `CbxTree` interface also inherits methods from its parent, [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement).
+
+Validation-related methods [`checkValidity()`](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals/checkValidity), [`reportValidity()`](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals/reportValidity), and [`setValidity()`](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals/setValidity) are transparently exposed from the underlying `ElementInternals` object which allows the `<cbx-tree>` element participate in form validation.
+
+### `CbxTree.setData()`
+
+The `setData()` method is used for complete overwriting and rerendering the entire tree. It accepts a single argument, a new [tree data](#tree-data-structure). All existing changes will be lost and replaced by the newly provided data after calling this method. See an example in the [Usage notes](#usage-notes) section.
+
+### `CbxTree.toJSON()`
+
+Returns the current state of the tree in the same format as the array used for tree initialisation. This method allows for JSON serialisation of the control state. 
+
+```javascript
+const readingList = document.querySelector('[name="reading-list[]"]');
+console.log('Tree data:', JSON.stringify(readingList, null, 2));
+```
 
 ## Events
 
