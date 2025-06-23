@@ -20,8 +20,8 @@ stylesheet.replaceSync(css);
  * Internal representation for a single item of the tree
  * @typedef {object} CbxTreeItem
  * @property {string} id - Item identifier, unique within the entire tree
- * @property {string} value - Item checkbox’s value
  * @property {string} title - Item title
+ * @property {string} value - Item checkbox’s value
  * @property {string} [icon] - Item icon’s URL
  * @property {CbxTreeMap | null} [children] - A map of child items, or `null` if subtree isn’t fetched yet
  * @property {'checked' | 'unchecked' | 'indeterminate'} state - Computed state of the item’s selection
@@ -158,8 +158,18 @@ export default class CbxTree extends HTMLElement {
       return;
     }
     const itemElement = target.closest('[part="item"]');
-    itemElement.ariaExpanded = itemElement.ariaExpanded === 'true' ? 'false' : 'true';
-    this.#requestSubtree(unprefixId(itemElement.id));
+    const isExpanding = itemElement.ariaExpanded !== 'true';
+    itemElement.ariaExpanded = isExpanding ? 'true' : 'false';
+    const id = unprefixId(itemElement.id);
+    if (isExpanding) {
+      this.#requestSubtree(id);
+    }
+    const item = this.#getItem(id);
+    this.dispatchEvent(new CustomEvent('cbxtreetoggle', {bubbles: true, detail: {
+      title: item.title,
+      value: item.value,
+      newState: isExpanding ? 'open' : 'closed',
+    }}));
   }
 
 
