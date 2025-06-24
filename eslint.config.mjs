@@ -1,7 +1,7 @@
 import {defineConfig} from 'eslint/config';
 import globals from 'globals';
 import js from '@eslint/js';
-import stylisticJs from '@stylistic/eslint-plugin-js';
+import stylistic from '@stylistic/eslint-plugin';
 
 export default defineConfig([
   {
@@ -21,17 +21,17 @@ export default defineConfig([
     },
     plugins: {
       js,
-      '@stylistic/js': stylisticJs,
+      '@stylistic': stylistic,
     },
     extends: ['js/recommended'],
     rules: {
       'no-var': 'error',
       'object-shorthand': ['error', 'always', {'ignoreConstructors': true}],
-      '@stylistic/js/comma-dangle': ['error', {'arrays': 'always-multiline',  'objects': 'always-multiline'}],
-      '@stylistic/js/indent': ['error', 2, {SwitchCase: 1}],
-      '@stylistic/js/no-extra-semi': 'error',
-      '@stylistic/js/quotes': ['error', 'single'],
-      '@stylistic/js/semi': 'error',
+      '@stylistic/comma-dangle': ['error', {'arrays': 'always-multiline',  'objects': 'always-multiline'}],
+      '@stylistic/indent': ['error', 2, {SwitchCase: 1}],
+      '@stylistic/no-extra-semi': 'error',
+      '@stylistic/quotes': ['error', 'single'],
+      '@stylistic/semi': 'error',
     },
   },
 ]);

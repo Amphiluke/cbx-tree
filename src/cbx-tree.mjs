@@ -10,9 +10,10 @@ stylesheet.replaceSync(css);
  * Raw user-defined data for a single item of the tree
  * @typedef {object} CbxRawTreeItem
  * @property {string} title - Item title
- * @property {string} value - Item checkbox’s value
- * @property {boolean} [checked] - Item selection state
+ * @property {string} value - Item checkbox’s value, unique within the entire tree
  * @property {string} [icon] - Item icon’s URL
+ * @property {boolean} [checked] - Item selection state
+ * @property {boolean} [collapsed] - Whether a children subtree is collapsed
  * @property {CbxRawTreeItem[] | null} [children] - A list of child items, or `null` if subtree isn’t fetched yet
  */
 
@@ -21,10 +22,11 @@ stylesheet.replaceSync(css);
  * @typedef {object} CbxTreeItem
  * @property {string} id - Item identifier, unique within the entire tree
  * @property {string} title - Item title
- * @property {string} value - Item checkbox’s value
+ * @property {string} value - Item checkbox’s value, unique within the entire tree
  * @property {string} [icon] - Item icon’s URL
- * @property {CbxTreeMap | null} [children] - A map of child items, or `null` if subtree isn’t fetched yet
  * @property {'checked' | 'unchecked' | 'indeterminate'} state - Computed state of the item’s selection
+ * @property {boolean} [collapsed] - Whether a children subtree is collapsed
+ * @property {CbxTreeMap | null} [children] - A map of child items, or `null` if subtree isn’t fetched yet
  */
 
 /**
@@ -165,10 +167,12 @@ export default class CbxTree extends HTMLElement {
       this.#requestSubtree(id);
     }
     const item = this.#getItem(id);
+    item.collapsed = !isExpanding;
+    this.#internals.setFormValue(this.formData, JSON.stringify(this));
     this.dispatchEvent(new CustomEvent('cbxtreetoggle', {bubbles: true, detail: {
       title: item.title,
       value: item.value,
-      newState: isExpanding ? 'open' : 'closed',
+      newState: isExpanding ? 'expanded' : 'collapsed',
     }}));
   }
 
@@ -203,6 +207,7 @@ export default class CbxTree extends HTMLElement {
         title: rawItem.title,
         value: rawItem.value,
         icon: rawItem.icon,
+        collapsed: rawItem.children?.length ? !!rawItem.collapsed : (rawItem.children === null ? true : undefined),
         children: rawItem.children ? this.#buildTree(rawItem.children, id) : rawItem.children,
       };
       Object.defineProperty(item, 'state', {
@@ -332,8 +337,9 @@ export default class CbxTree extends HTMLElement {
     return [...tree.values()].map((item) => ({
       title: item.title,
       value: item.value,
-      checked: this.#selection.has(item.id),
       icon: item.icon,
+      checked: this.#selection.has(item.id),
+      collapsed: item.collapsed === true ? true : undefined,
       children: item.children ? this.#toRaw(item.children) : item.children,
     }));
   }
@@ -355,6 +361,27 @@ export default class CbxTree extends HTMLElement {
 
   toJSON() {
     return this.#toRaw();
+  }
+
+  /**
+   * Expand or collapse all tree items. Items that have on-demand loading behavior are not expanded by this method
+   * @param {boolean} [isExpanding] - Whether the items should be expanded
+   */
+  toggle(isExpanding) {
+    let itemElements = [...this.#shadowRoot.querySelectorAll('[part="item"]:has([part="tree"])')];
+    if (isExpanding === undefined) {
+      isExpanding = itemElements.some(({ariaExpanded}) => ariaExpanded === 'false');
+    }
+    const ariaExpanded = String(isExpanding);
+    itemElements.forEach((itemElement) => {
+      if (itemElement.ariaExpanded === ariaExpanded) {
+        return;
+      }
+      itemElement.ariaExpanded = ariaExpanded;
+      const item = this.#getItem(unprefixId(itemElement.id));
+      item.collapsed = !isExpanding;
+    });
+    this.#internals.setFormValue(this.formData, JSON.stringify(this));
   }
 
 

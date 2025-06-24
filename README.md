@@ -72,6 +72,7 @@ The first way is to provide tree data directly in HTML by adding JSON content as
             "title": "Ancient Mesopotamian poems",
             "value": "category-151",
             "icon": "/icons/mesopotamian-icon.svg",
+            "collapsed": true,
             "children": [
               {
                 "title": "Epic of Gilgamesh",
@@ -132,6 +133,7 @@ customElements.whenDefined('cbx-tree').then(() => {
           title: 'Ancient Mesopotamian poems',
           value: 'category-151',
           icon: '/icons/mesopotamian-icon.svg',
+          collapsed: true,
           children: [
             {
               title: 'Epic of Gilgamesh',
@@ -153,15 +155,17 @@ customElements.whenDefined('cbx-tree').then(() => {
 
 As shown in the examples above, the tree is initialised with an array of objects representing the tree’s root items. Each item can have children forming a nested subtree. The table below provides information about the properties that can be specified for tree items at any nesting level.
 
-| Property   | Type             | Required | Description                                                       |
-| ---------- | ---------------- | -------- | ----------------------------------------------------------------- |
-| `title`    | string           | yes      | Text label of the tree item                                       |
-| `value`    | string           | yes      | Internal value identifying the checked item in the submitted data |
-| `checked`  | boolean          | no       | Initial state of the item selection                               |
-| `icon`     | string           | no       | Item icons’s URL                                                  |
-| `children` | array or `null`¹ | no       | Nested subtree items                                              |
+| Property    | Type             | Required | Description                                                       |
+| ----------- | ---------------- | -------- | ----------------------------------------------------------------- |
+| `title`     | string           | yes      | Text label of the tree item                                       |
+| `value`     | string¹          | yes      | Internal value identifying the checked item in the submitted data |
+| `icon`      | string           | no       | Item icons’s URL                                                  |
+| `checked`   | boolean          | no       | Initial state of the item selection                               |
+| `collapsed` | boolean          | no       | Whether a nested subtree is collapsed initially                   |
+| `children`  | array or `null`² | no       | Nested subtree items                                              |
 
-¹ <small>The value `null` of the `children` property is used for [on-demand loading of the subtree](#cbxtreesubtreeprovider).</small>
+¹ Must be unique within the entire tree.\
+² The value `null` of the `children` property is used for [on-demand loading of the subtree](#cbxtreesubtreeprovider).
 
 ## Attributes
 
@@ -239,6 +243,17 @@ Validation-related methods [`checkValidity()`](https://developer.mozilla.org/en-
 
 The `setData()` method is used for complete overwriting and rerendering the entire tree. It accepts a single argument, a new [tree data](#tree-data-structure). All existing changes will be lost and replaced by the newly provided data after calling this method. See an example in the [Usage notes](#usage-notes) section.
 
+### `CbxTree.toggle()`
+
+Use this method for dynamic expansion or collapsing of all items in the tree. The method accepts an optional boolean argument, `isExpanding`, which controls whether items should be expanded (`true`) or collapsed (`false`).
+
+```javascript
+const readingList = document.querySelector('[name="reading-list[]"]');
+readingList.toggle(false); // collapse all
+```
+
+Note that this method doesn’t expand items that have [on-demand loading](#cbxtreesubtreeprovider) behavior. Also, programmatic toggling doesn’t trigger the [`cbxtreetoggle` event](#cbxtreetoggle).
+
 ### `CbxTree.toJSON()`
 
 Returns the current state of the tree in the same format as the array used for tree initialisation. This method allows for JSON serialisation of the control state. 
@@ -266,11 +281,11 @@ readingList.addEventListener('cbxtreechange', (e) => {
 
 The `cbxtreetoggle` custom event is fired when the user clicks a toggle button to expand or collapse a subtree under one of the tree items. The `detail` property of the event instance provides additional information about the target item:
 
-| Property   | Description                                              |
-| ---------- | -------------------------------------------------------- |
-| `title`    | Title of the target item                                 |
-| `value`    | Value of the target item                                 |
-| `newState` | New state of the target item (either `open` or `closed`) |
+| Property   | Description                                                     |
+| ---------- | --------------------------------------------------------------- |
+| `title`    | Title of the target item                                        |
+| `value`    | Value of the target item                                        |
+| `newState` | New state of the target item (either `expanded` or `collapsed`) |
 
 ```javascript
 const readingList = document.querySelector('[name="reading-list[]"]');

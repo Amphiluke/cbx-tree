@@ -18,8 +18,8 @@ export const treeTemplate = (tree, isRoot = true) => `
  * @param {CbxTreeItem} item - Tree item data
  * @returns {string}
  */
-export const itemTemplate = ({id, title, icon, children}) => `
-<li id="item_${id}" part="item" role="treeitem" aria-expanded="${children?.size ? 'true' : (children ? 'false' : 'undefined')}">
+export const itemTemplate = ({id, title, icon, collapsed, children}) => `
+<li id="item_${id}" part="item" role="treeitem" aria-expanded="${collapsed === undefined ? 'undefined' : !collapsed}">
   ${(children !== undefined) ? '<button type="button" part="toggle"></button>' : ''}
   <label part="label">
     <input type="checkbox" id="cbx_${id}" part="checkbox">
