@@ -1,3 +1,12 @@
+:host {
+  --cbx-tree-toggle-closed-mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 14" width="8" height="14"><path d="M1.5 2.5v9L7 7z"/></svg>');
+  --cbx-tree-toggle-open-mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 8" width="14" height="8"><path d="M2.5 1.5h9L7 7z"/></svg>');
+  --cbx-tree-toggle-pending-mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" width="14" height="14"><path d="M7 1A6 6 0 1 1 1 7" fill="none" stroke="black" stroke-width="2"><animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0 7 7" to="360 7 7" dur="1s" repeatCount="indefinite"/></path></svg>');
+
+  --cbx-tree-label-hover-bg: SelectedItem;
+  --cbx-tree-label-hover-fg: SelectedItemText;
+}
+
 :host(:not([hidden])) {
   display: block;
 }
@@ -10,12 +19,16 @@
   &:has([inert]) {
     cursor: progress;
   }
+
+  &:not([part='tree'] [part='tree']) {
+    overflow-x: clip; /* clipping the pseudo-element [part='label']::before */
+  }
 }
 
 [part='item'] {
   align-items: center;
   display: grid;
-  gap: 0.4em 0.6ch;
+  gap: 0 0.6ch;
   grid-template-areas:
     "toggle label"
     "tree   tree";
@@ -27,36 +40,42 @@
 }
 
 [part='toggle'] {
-  --toggle-closed: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 14" width="8" height="14"><path d="M1.5 2.5v9L7 7z"/></svg>');
-  --toggle-opened: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 8" width="14" height="8"><path d="M2.5 1.5h9L7 7z"/></svg>');
-  --toggle-pending: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" width="14" height="14"><path d="M7 1A6 6 0 1 1 1 7" fill="none" stroke="black" stroke-width="2"><animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0 7 7" to="360 7 7" dur="1s" repeatCount="indefinite"/></path></svg>');
-  background: currentColor;
+  background: none;
   border: none;
   color: inherit;
   font: inherit;
   grid-area: toggle;
   height: max(1em, 16px);
-  mask: var(--toggle-closed) 50% 50% / contain no-repeat;
   padding: 0;
   position: relative;
   width: max(1em, 16px);
+  z-index: 1;
 
   &:not(:disabled) {
     cursor: pointer;
   }
 
-  [aria-expanded='true'] > & {
-    mask-image: var(--toggle-opened);
-  }
-
-  [inert] > & {
-    mask-image: var(--toggle-pending);
-  }
-
   &::before {
+    background: currentColor;
     content: '';
     inset: -4px;
+    mask: var(--cbx-tree-toggle-closed-mask) 50% 50% / contain no-repeat content-box;
+    padding: 4px;
     position: absolute;
+  }
+
+  [aria-expanded='true'] > &::before {
+    mask-image: var(--cbx-tree-toggle-open-mask);
+  }
+
+  [inert] > &::before {
+    mask-image: var(--cbx-tree-toggle-pending-mask);
+  }
+
+  &:where(:hover, :focus-visible)::before,
+  &:has(+ [part='label']:hover)::before,
+  [part='item']:has(> [part='label'] :focus-visible) > &::before {
+    color: var(--cbx-tree-label-hover-fg);
   }
 }
 
@@ -65,6 +84,24 @@
   display: flex;
   gap: inherit;
   grid-area: label;
+  isolation: isolate;
+  padding-block: 0.2em;
+  position: relative;
+
+  &:hover,
+  &:has(:focus-visible),
+  [part='toggle']:where(:hover, :focus-visible) + & {
+    background: var(--cbx-tree-label-hover-bg);
+    color: var(--cbx-tree-label-hover-fg);
+  }
+
+  &::before {
+    background: inherit;
+    content: '';
+    inset: 0 0 0 -100vw;
+    position: absolute;
+    z-index: -1;
+  }
 }
 
 :where([part='item']) [part='tree'] {

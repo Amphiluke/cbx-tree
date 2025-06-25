@@ -14,7 +14,7 @@
         margin: 20px 10px 80px;
         height: 450px;
         overflow: auto;
-        padding: 8px 8px 8px 6px;
+        padding: 8px;
         scrollbar-width: thin;
         width: 575px;
       }
@@ -24,6 +24,35 @@
         grid-template-columns: 1fr 1fr;
         margin-block: 1em;
         width: fit-content;
+
+        cbx-tree {
+          --cbx-tree-toggle-closed-mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" width="14" height="14"><path d="M2 7L12 7M7 2L7 12" stroke-width="1.2" stroke="black"/></svg>');
+          --cbx-tree-toggle-open-mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" width="14" height="14"><path d="M2 7L12 7" stroke-width="1.2" stroke="black"/></svg>');
+        }
+      }
+
+      @media (prefers-color-scheme: light) {
+        html {
+          accent-color: Sienna;
+          background: AntiqueWhite;
+          color: SaddleBrown;
+        }
+
+        cbx-tree {
+          --cbx-tree-label-hover-bg: hsl(from SaddleBrown h s calc(l + 52));
+          --cbx-tree-label-hover-fg: SaddleBrown;
+          scrollbar-color: SaddleBrown AntiqueWhite;
+
+          &::part(icon) {
+            background-blend-mode: exclusion;
+          }
+        }
+      }
+
+      @media (prefers-color-scheme: dark) {
+        cbx-tree::part(icon) {
+          filter: brightness(1.5);
+        }
       }
     </style>
   </head>
@@ -35,68 +64,68 @@
             {
               "title": "Epic poetry",
               "value": "epic-poetry",
-              "icon": "/icons/epic.svg",
+              "icon": "./icons/lyre.svg",
               "children": [
                 {
                   "title": "Greek epic poems",
                   "value": "greek-epic-poems",
-                  "icon": "/icons/greek.svg",
+                  "icon": "./icons/globe.svg",
                   "children": [
                     {
                       "title": "Iliad, <i>by Homer</i>",
                       "value": "iliad",
-                      "icon": "/icons/manuscript.svg",
+                      "icon": "./icons/manuscript.svg",
                       "checked": true
                     },
                     {
                       "title": "Odyssey, <i>by Homer</i>",
                       "value": "odyssey",
-                      "icon": "/icons/manuscript.svg",
+                      "icon": "./icons/manuscript.svg",
                       "checked": true
                     },
                     {
                       "title": "Theogony, <i>by Hesoid</i>",
                       "value": "theogony",
-                      "icon": "/icons/manuscript.svg"
+                      "icon": "./icons/manuscript.svg"
                     },
                     {
                       "title": "Works and Days, <i>by Hesoid</i>",
                       "value": "works-and-days",
-                      "icon": "/icons/manuscript.svg"
+                      "icon": "./icons/manuscript.svg"
                     },
                     {
                       "title": "Argonautica, <i>by Apollonius of Rhodes</i>",
                       "value": "argonautica",
-                      "icon": "/icons/manuscript.svg"
+                      "icon": "./icons/manuscript.svg"
                     }
                   ]
                 },
                 {
                   "title": "Latin epic poems",
                   "value": "latin-epic-poems",
-                  "icon": "/icons/latin.svg",
+                  "icon": "./icons/globe.svg",
                   "children": [
                     {
                       "title": "Aeneid, <i>by Virgil</i>",
                       "value": "aeneid",
-                      "icon": "/icons/manuscript.svg"
+                      "icon": "./icons/manuscript.svg"
                     },
                     {
                       "title": "Argonautica, <i>by Gaius Valerius Flaccus</i>",
                       "value": "argonautica-latn",
-                      "icon": "/icons/manuscript.svg"
+                      "icon": "./icons/manuscript.svg"
                     }
                   ]
                 },
                 {
                   "title": "Sumerian epic poems",
                   "value": "sumerian-epic-poems",
-                  "icon": "/icons/sumerian.svg",
+                  "icon": "./icons/globe.svg",
                   "children": [
                     {
                       "title": "Epic of Gilgamesh",
                       "value": "epic-of-gilgamesh",
-                      "icon": "/icons/manuscript.svg",
+                      "icon": "./icons/manuscript.svg",
                       "checked": true
                     }
                   ]
@@ -104,40 +133,40 @@
                 {
                   "title": "Indian epic poems",
                   "value": "indian-epic-poems",
-                  "icon": "/icons/indian.svg",
+                  "icon": "./icons/globe.svg",
                   "children": [
                     {
                       "title": "Mahabharata, <i>by Vyasa</i>",
                       "value": "mahabharata",
-                      "icon": "/icons/manuscript.svg",
+                      "icon": "./icons/manuscript.svg",
                       "checked": true
                     },
                     {
                       "title": "Ramayana, <i>by Valmiki</i>",
                       "value": "ramayana",
-                      "icon": "/icons/manuscript.svg"
+                      "icon": "./icons/manuscript.svg"
                     },
                     {
                       "title": "Silappatikaram, <i>by Ilango Adigal</i>",
                       "value": "silappatikaram",
-                      "icon": "/icons/manuscript.svg"
+                      "icon": "./icons/manuscript.svg"
                     },
                     {
                       "title": "Manimekalai, <i>by Chithalai Chathanar</i>",
                       "value": "Manimekalai",
-                      "icon": "/icons/manuscript.svg"
+                      "icon": "./icons/manuscript.svg"
                     }
                   ]
                 },
                 {
                   "title": "English epic poems",
                   "value": "english-epic-poems",
-                  "icon": "/icons/english.svg",
+                  "icon": "./icons/globe.svg",
                   "children": [
                     {
                       "title": "Beowulf",
                       "value": "beowulf",
-                      "icon": "/icons/manuscript.svg",
+                      "icon": "./icons/manuscript.svg",
                       "checked": true
                     }
                   ]
@@ -147,45 +176,45 @@
             {
               "title": "History books",
               "value": "history-books",
-              "icon": "/icons/history.svg",
+              "icon": "./icons/castle.svg",
               "children": [
                 {
                   "title": "Greek history books",
                   "value": "greek-history-books",
-                  "icon": "/icons/greek.svg",
+                  "icon": "./icons/globe.svg",
                   "children": [
                     {
                       "title": "Histories, <i>by Herodotus</i>",
                       "value": "histories",
-                      "icon": "/icons/manuscript.svg",
+                      "icon": "./icons/manuscript.svg",
                       "checked": true
                     },
                     {
                       "title": "History of the Peloponnesian War, <i>by Thucydides</i>",
                       "value": "history-of-the-peloponnesian-war",
-                      "icon": "/icons/manuscript.svg"
+                      "icon": "./icons/manuscript.svg"
                     },
                     {
                       "title": "Hellenica, <i>by Xenophon</i>",
                       "value": "hellenica",
-                      "icon": "/icons/manuscript.svg"
+                      "icon": "./icons/manuscript.svg"
                     }
                   ]
                 },
                 {
                   "title": "Latin history books",
                   "value": "latin-history-books",
-                  "icon": "/icons/latin.svg",
+                  "icon": "./icons/globe.svg",
                   "children": [
                     {
                       "title": "Annals, <i>by Tacitus</i>",
                       "value": "annals",
-                      "icon": "/icons/manuscript.svg"
+                      "icon": "./icons/manuscript.svg"
                     },
                     {
                       "title": "Commentarii de Bello Gallico, <i>by Julius Caesar</i>",
                       "value": "commentarii-de-bello-gallico",
-                      "icon": "/icons/manuscript.svg",
+                      "icon": "./icons/manuscript.svg",
                       "checked": true
                     }
                   ]
@@ -193,12 +222,12 @@
                 {
                   "title": "English history books",
                   "value": "english-history-books",
-                  "icon": "/icons/english.svg",
+                  "icon": "./icons/globe.svg",
                   "children": [
                     {
                       "title": "The Chronology of Ancient Kingdoms Amended, <i>by Isaac Newton</i>",
                       "value": "the-chronology-of-ancient-kingdoms-amended",
-                      "icon": "/icons/manuscript.svg"
+                      "icon": "./icons/manuscript.svg"
                     }
                   ]
                 }
@@ -207,59 +236,59 @@
             {
               "title": "Philosophical books",
               "value": "philosophical-books",
-              "icon": "/icons/philosophy.svg",
+              "icon": "./icons/portico.svg",
               "collapsed": true,
               "children": [
                 {
                   "title": "Greek philosophical books",
                   "value": "greek-philosophical-books",
-                  "icon": "/icons/greek.svg",
+                  "icon": "./icons/globe.svg",
                   "children": [
                     {
                       "title": "Republic, <i>by Plato</i>",
                       "value": "republic",
-                      "icon": "/icons/manuscript.svg"
+                      "icon": "./icons/manuscript.svg"
                     },
                     {
                       "title": "On the Soul, <i>by Aristotle</i>",
                       "value": "on-the-soul",
-                      "icon": "/icons/manuscript.svg"
+                      "icon": "./icons/manuscript.svg"
                     },
                     {
                       "title": "Moralia, <i>by Plutarch</i>",
                       "value": "moralia",
-                      "icon": "/icons/manuscript.svg"
+                      "icon": "./icons/manuscript.svg"
                     }
                   ]
                 },
                 {
                   "title": "Latin philosophical books",
                   "value": "latin-philosophical-books",
-                  "icon": "/icons/latin.svg",
+                  "icon": "./icons/globe.svg",
                   "collapsed": true,
                   "children": [
                     {
                       "title": "De Natura Deorum, <i>by Cicero</i>",
                       "value": "de-natura-deorum",
-                      "icon": "/icons/manuscript.svg"
+                      "icon": "./icons/manuscript.svg"
                     },
                     {
                       "title": "Epistulae Morales ad Lucilium, <i>by Seneca</i>",
                       "value": "epistulae-morales-ad-lucilium",
-                      "icon": "/icons/manuscript.svg"
+                      "icon": "./icons/manuscript.svg"
                     }
                   ]
                 },
                 {
                   "title": "Indian philosophical books",
                   "value": "indian-philosophical-books",
-                  "icon": "/icons/indian.svg",
+                  "icon": "./icons/globe.svg",
                   "collapsed": true,
                   "children": [
                     {
                       "title": "Upanishads",
                       "value": "upanishads",
-                      "icon": "/icons/manuscript.svg"
+                      "icon": "./icons/manuscript.svg"
                     }
                   ]
                 }

@@ -252,7 +252,7 @@ const readingList = document.querySelector('[name="reading-list[]"]');
 readingList.toggle(false); // collapse all
 ```
 
-Note that this method doesn’t expand items that have [on-demand loading](#cbxtreesubtreeprovider) behavior. Also, programmatic toggling doesn’t trigger the [`cbxtreetoggle` event](#cbxtreetoggle).
+Note that this method doesn’t expand items that have [on-demand loading](#cbxtreesubtreeprovider) behavior. Also, programmatic toggling doesn’t trigger the [`cbxtreetoggle` event](#cbxtreetoggle-1).
 
 ### `CbxTree.toJSON()`
 
