@@ -6,7 +6,7 @@ The `<cbx-tree>` element is a web component for building tree-like hierarchic li
 * *unchecked*: the item and all its children are unchecked,
 * *indeterminate*: the item is technically unchecked but some its children are checked.
 
-... demo image here ...
+![Demonstration of design and functionality of the <cbx-tree> element](./docs/demo.webm)
 
 ## Installation and import
 
@@ -294,3 +294,46 @@ readingList.addEventListener('cbxtreetoggle', (e) => {
   console.log(`Item “${title}” (${value}) is now ${newState}`);
 });
 ```
+
+## Styling with CSS
+
+The `<cbx-tree>` element provides a few CSS custom properties (variables) that you can override for your needs.
+
+| Variable                         | Data type  | Description                                             |
+| -------------------------------- | ---------- | ------------------------------------------------------- |
+| `--cbx-tree-toggle-closed-mask`  | `<url>`¹   | Mask image for the toggle button in the collapsed state |
+| `--cbx-tree-toggle-open-mask`    | `<url>`    | Mask image for the toggle button in the expanded state  |
+| `--cbx-tree-toggle-pending-mask` | `<url>`    | Mask image for the toggle button in the pending state   |
+| `--cbx-tree-label-hover-bg`      | `<color>`² | Background color for the highlighted item’s label       |
+| `--cbx-tree-label-hover-fg`      | `<color>`  | Text color for the highlighted item’s label             |
+
+¹ https://developer.mozilla.org/en-US/docs/Web/CSS/url_value \
+² https://developer.mozilla.org/en-US/docs/Web/CSS/color_value
+
+In the following example, item toggle button’s mask is changed from the default arrow to “+/&minus;” icons:
+
+```css
+cbx-tree {
+  --cbx-tree-toggle-closed-mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" width="14" height="14"><path d="M3 7L11 7M7 3L7 11" stroke="black"/></svg>');
+  --cbx-tree-toggle-open-mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" width="14" height="14"><path d="M3 7L11 7" stroke="black"/></svg>');
+}
+```
+
+Additionally, parts of the `<cbx-tree>` element can be directly styled through the [`::part()` pseudo-element](https://developer.mozilla.org/en-US/docs/Web/CSS/::part).
+
+> [!CAUTION]
+> Directly styling the inner parts of the tree is (to some extent) an advanced technique that comes with the risk of breaking the tree’s UI. Use it as a last resort if the desired result cannot be achieved with regular CSS inheritance.
+
+The available `::part()` pseudo-elements are listed in the following table and are shown in the picture below.
+
+| Pseudo-element     | Matched parts                                        |
+| ------------------ | ---------------------------------------------------- |
+| `::part(tree)`     | The root tree and any nested subtree                 |
+| `::part(item)`     | Any individual item of a tree/subtree                |
+| `::part(toggle)`   | Item toggle buttons                                  |
+| `::part(label)`    | Wrappers around any item’s checkbox, icon, and title |
+| `::part(checkbox)` | Any item’s checkbox                                  |
+| `::part(icon)`     | Any item’s icon                                      |
+| `::part(title)`    | Any item’s title                                     |
+
+![Tree parts that can be styled using the ::part() selector](./docs/parts.png)

@@ -26,8 +26,8 @@
         width: fit-content;
 
         cbx-tree {
-          --cbx-tree-toggle-closed-mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" width="14" height="14"><path d="M2 7L12 7M7 2L7 12" stroke-width="1.2" stroke="black"/></svg>');
-          --cbx-tree-toggle-open-mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" width="14" height="14"><path d="M2 7L12 7" stroke-width="1.2" stroke="black"/></svg>');
+          --cbx-tree-toggle-closed-mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" width="14" height="14"><path d="M3 7L11 7M7 3L7 11" stroke-width="1.2" stroke="black"/></svg>');
+          --cbx-tree-toggle-open-mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" width="14" height="14"><path d="M3 7L11 7" stroke-width="1.2" stroke="black"/></svg>');
         }
       }
 
@@ -39,13 +39,9 @@
         }
 
         cbx-tree {
-          --cbx-tree-label-hover-bg: hsl(from SaddleBrown h s calc(l + 52));
+          --cbx-tree-label-hover-bg: rgb(from SaddleBrown r g b / 0.15);
           --cbx-tree-label-hover-fg: SaddleBrown;
           scrollbar-color: SaddleBrown AntiqueWhite;
-
-          &::part(icon) {
-            background-blend-mode: exclusion;
-          }
         }
       }
 

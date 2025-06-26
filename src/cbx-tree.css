@@ -91,12 +91,14 @@
   &:hover,
   &:has(:focus-visible),
   [part='toggle']:where(:hover, :focus-visible) + & {
-    background: var(--cbx-tree-label-hover-bg);
     color: var(--cbx-tree-label-hover-fg);
+
+    &::before {
+      background: var(--cbx-tree-label-hover-bg);
+    }
   }
 
   &::before {
-    background: inherit;
     content: '';
     inset: 0 0 0 -100vw;
     position: absolute;
