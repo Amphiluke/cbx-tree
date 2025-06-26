@@ -6,7 +6,7 @@ The `<cbx-tree>` element is a web component for building tree-like hierarchic li
 * *unchecked*: the item and all its children are unchecked,
 * *indeterminate*: the item is technically unchecked but some its children are checked.
 
-![Demonstration of design and functionality of the <cbx-tree> element](./docs/demo.webm)
+![Demonstration of design and functionality of the <cbx-tree> element](./docs/demo.gif)
 
 ## Installation and import
 
