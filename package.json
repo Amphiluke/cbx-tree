@@ -1,13 +1,13 @@
 {
   "name": "cbx-tree",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Web Component for building tree-like UI with checkable items",
   "type": "module",
-  "main": "./dist/cbx-tree.min.mjs",
+  "main": "./dist/cbx-tree.mjs",
   "exports": {
     ".": {
       "types": "./dist/cbx-tree.d.mts",
-      "default": "./dist/cbx-tree.min.mjs"
+      "default": "./dist/cbx-tree.mjs"
     }
   },
   "files": [
