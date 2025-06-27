@@ -33,7 +33,7 @@ If you don’t use bundlers, just import the component as a module in your HTML 
 or in ES modules:
 
 ```javascript
-import "https://unpkg.com/cbx-tree";
+import 'https://unpkg.com/cbx-tree';
 ```
 
 ## Usage notes

@@ -7,6 +7,7 @@
   "exports": {
     ".": {
       "types": "./dist/cbx-tree.d.mts",
+      "browser": "./dist/cbx-tree.mjs",
       "default": "./dist/cbx-tree.mjs"
     }
   },
