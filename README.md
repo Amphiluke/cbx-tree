@@ -299,16 +299,18 @@ readingList.addEventListener('cbxtreetoggle', (e) => {
 
 The `<cbx-tree>` element provides a few CSS custom properties (variables) that you can override for your needs.
 
-| Variable                         | Data type  | Description                                             |
-| -------------------------------- | ---------- | ------------------------------------------------------- |
-| `--cbx-tree-toggle-closed-mask`  | `<url>`¹   | Mask image for the toggle button in the collapsed state |
-| `--cbx-tree-toggle-open-mask`    | `<url>`    | Mask image for the toggle button in the expanded state  |
-| `--cbx-tree-toggle-pending-mask` | `<url>`    | Mask image for the toggle button in the pending state   |
-| `--cbx-tree-label-hover-bg`      | `<color>`² | Background color for the highlighted item’s label       |
-| `--cbx-tree-label-hover-fg`      | `<color>`  | Text color for the highlighted item’s label             |
+| Variable                         | Data type   | Description                                             |
+| -------------------------------- | ----------- | ------------------------------------------------------- |
+| `--cbx-tree-toggle-closed-mask`  | `<url>`¹    | Mask image for the toggle button in the collapsed state |
+| `--cbx-tree-toggle-open-mask`    | `<url>`     | Mask image for the toggle button in the expanded state  |
+| `--cbx-tree-toggle-pending-mask` | `<url>`     | Mask image for the toggle button in the pending state   |
+| `--cbx-tree-label-hover-bg`      | `<color>`²  | Background color for the highlighted item’s label       |
+| `--cbx-tree-label-hover-fg`      | `<color>`   | Text color for the highlighted item’s label             |
+| `--cbx-tree-nesting-indent`      | `<length>`³ | Indentation size for nested subtrees                    |
 
 ¹ https://developer.mozilla.org/en-US/docs/Web/CSS/url_value \
 ² https://developer.mozilla.org/en-US/docs/Web/CSS/color_value
+³ https://developer.mozilla.org/en-US/docs/Web/CSS/length
 
 In the following example, item toggle button’s mask is changed from the default arrow to “+/&minus;” icons:
 
@@ -337,3 +339,13 @@ The available `::part()` pseudo-elements are listed in the following table and a
 | `::part(title)`    | Any item’s title                                     |
 
 ![Tree parts that can be styled using the ::part() selector](./docs/parts.png)
+
+```css
+cbx-tree::part(title) {
+  transition: scale 0.2s ease-in-out;
+  transform-origin: 0 50%;
+}
+cbx-tree::part(title):hover {
+  scale: 1.1;
+}
+```

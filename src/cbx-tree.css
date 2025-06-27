@@ -5,6 +5,12 @@
 
   --cbx-tree-label-hover-bg: SelectedItem;
   --cbx-tree-label-hover-fg: SelectedItemText;
+
+  --cbx-tree-nesting-indent: 1em;
+}
+
+:host(:dir(rtl)) {
+  --cbx-tree-toggle-closed-mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 14" width="8" height="14"><path d="M6.5 2.5v9L1 7z"/></svg>');
 }
 
 :host(:not([hidden])) {
@@ -100,7 +106,8 @@
 
   &::before {
     content: '';
-    inset: 0 0 0 -100vw;
+    inset: 0;
+    inset-inline-start: -100vw;
     position: absolute;
     z-index: -1;
   }
@@ -108,5 +115,5 @@
 
 :where([part='item']) [part='tree'] {
   grid-area: tree;
-  padding-inline-start: 1em;
+  padding-inline-start: var(--cbx-tree-nesting-indent);
 }
