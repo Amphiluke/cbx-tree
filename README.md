@@ -309,7 +309,7 @@ The `<cbx-tree>` element provides a few CSS custom properties (variables) that y
 | `--cbx-tree-nesting-indent`      | `<length>`³ | Indentation size for nested subtrees                    |
 
 ¹ https://developer.mozilla.org/en-US/docs/Web/CSS/url_value \
-² https://developer.mozilla.org/en-US/docs/Web/CSS/color_value
+² https://developer.mozilla.org/en-US/docs/Web/CSS/color_value \
 ³ https://developer.mozilla.org/en-US/docs/Web/CSS/length
 
 In the following example, item toggle button’s mask is changed from the default arrow to “+/&minus;” icons:
