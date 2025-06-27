@@ -1,0 +1,45 @@
+html {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+}
+[name="reading-list[]"] {
+  border: 1px solid;
+  margin: 20px 10px 80px;
+  height: 450px;
+  overflow: auto;
+  padding: 8px;
+  scrollbar-width: thin;
+  width: 575px;
+}
+.trees {
+  display: grid;
+  gap: 1em;
+  grid-auto-flow: column;
+  margin-block: 1em;
+  width: fit-content;
+
+  cbx-tree {
+    --cbx-tree-toggle-closed-mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" width="14" height="14"><path d="M3 7L11 7M7 3L7 11" stroke-width="1.2" stroke="black"/></svg>');
+    --cbx-tree-toggle-open-mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" width="14" height="14"><path d="M3 7L11 7" stroke-width="1.2" stroke="black"/></svg>');
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  html {
+    accent-color: Sienna;
+    background: AntiqueWhite;
+    color: SaddleBrown;
+  }
+
+  cbx-tree {
+    --cbx-tree-label-hover-bg: rgb(from SaddleBrown r g b / 0.15);
+    --cbx-tree-label-hover-fg: SaddleBrown;
+    scrollbar-color: SaddleBrown AntiqueWhite;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  cbx-tree::part(icon) {
+    filter: brightness(1.5);
+  }
+}
