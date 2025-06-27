@@ -8,6 +8,8 @@ The `<cbx-tree>` element is a web component for building tree-like hierarchic li
 
 ![Demonstration of design and functionality of the <cbx-tree> element](./docs/demo.gif)
 
+[Live demo on CodePen](https://codepen.io/amphiluke/pen/ogXVjdZ)
+
 ## Installation and import
 
 If you use a bundler in your project, install cbx-tree as a dependency:
@@ -25,13 +27,13 @@ import 'cbx-tree';
 If you don’t use bundlers, just import the component as a module in your HTML files:
 
 ```html
-<script type="module" src="https://esm.run/cbx-tree"></script>
+<script type="module" src="https://unpkg.com/cbx-tree"></script>
 ```
 
 or in ES modules:
 
 ```javascript
-import "https://esm.run/cbx-tree";
+import "https://unpkg.com/cbx-tree";
 ```
 
 ## Usage notes
