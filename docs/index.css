@@ -1,0 +1,105 @@
+html {
+  color-scheme: light dark;
+  font: normal 18px system-ui, sans-serif;
+  margin-inline: auto;
+  width: min(1200px, 100vw - 24px);
+
+  @media (width < 800px) {
+    font-size: 16px;
+  }
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  height: 100dvh;
+  margin: 0;
+}
+
+h1 {
+  text-align: center;
+}
+
+h1,
+h2 {
+  margin-bottom: 0.5em;
+  text-wrap: balance;
+}
+
+h2 {
+  font-size: 1.2em;
+}
+
+code {
+  background-color: light-dark(#0001, #ffffff1d);
+  border-radius: 0.2em;
+  padding: 0.1em 0.2em;
+}
+
+button {
+  font: inherit;
+}
+
+.archive-form {
+  display: contents;
+}
+
+.archive-head {
+  align-items: baseline;
+  display: flex;
+  gap: 0.8ch;
+
+  button {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+
+    &:first-of-type {
+      margin-inline-start: auto;
+    }
+  }
+}
+
+cbx-tree:defined {
+  border: 1px solid;
+  flex-grow: 1;
+  overflow: auto;
+  padding: 0.2em;
+  scrollbar-width: thin;
+}
+
+cbx-tree.user-interacted:invalid {
+  border-color: light-dark(#c00, #700);
+
+  &::part(checkbox) {
+    box-shadow: 0 0 4px 0 light-dark(#a00, #f00);
+  }
+}
+
+cbx-tree::part(icon) {
+  height: 1em;
+  width: 1em;
+}
+
+.archive-btn {
+  align-self: start;
+}
+
+.archive-popover {
+  border-radius: 4px;
+  border-width: 2px;
+  font-size: 0.9rem;
+  inset: auto 10px 10px auto;
+  max-height: 150px;
+  max-width: min(500px, 100vw);
+  padding: 0.6em;
+  scrollbar-width: thin;
+  white-space: pre-line;
+}
+
+.footer {
+  font-size: 0.8em;
+  padding-block: 1em 1.5em;
+  text-align: end;
+}

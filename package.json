@@ -1,6 +1,6 @@
 {
   "name": "cbx-tree",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Web Component for building tree-like UI with checkable items",
   "type": "module",
   "main": "./dist/cbx-tree.mjs",
@@ -37,9 +37,9 @@
   },
   "homepage": "https://github.com/Amphiluke/cbx-tree#readme",
   "devDependencies": {
-    "@eslint/js": "^9.29.0",
+    "@eslint/js": "^9.30.0",
     "@stylistic/eslint-plugin": "^5.0.0",
-    "eslint": "^9.29.0",
+    "eslint": "^9.30.0",
     "globals": "^16.2.0",
     "terser": "^5.43.1",
     "vite": "^6.3.5"

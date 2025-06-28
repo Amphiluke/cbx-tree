@@ -6,7 +6,7 @@ The `<cbx-tree>` element is a web component for building tree-like hierarchic li
 * *unchecked*: the item and all its children are unchecked,
 * *indeterminate*: the item is technically unchecked but some of its children are checked.
 
-![Demonstration of design and functionality of the <cbx-tree> element](./docs/demo.gif)
+![Demonstration of design and functionality of the <cbx-tree> element](./doc-assets/demo.gif)
 
 [Live demo on CodePen](https://codepen.io/amphiluke/pen/ogXVjdZ)
 
@@ -161,7 +161,7 @@ As shown in the examples above, the tree is initialised with an array of objects
 | ----------- | ---------------- | -------- | ----------------------------------------------------------------- |
 | `title`     | string           | yes      | Text label of the tree item                                       |
 | `value`     | string¹          | yes      | Internal value identifying the checked item in the submitted data |
-| `icon`      | string           | no       | Item icons’s URL                                                  |
+| `icon`      | string           | no       | Item icons’s URL or SVG icon code                                 |
 | `checked`   | boolean          | no       | Initial state of the item selection                               |
 | `collapsed` | boolean          | no       | Whether a nested subtree is collapsed initially                   |
 | `children`  | array or `null`² | no       | Nested subtree items                                              |
@@ -256,6 +256,17 @@ readingList.toggle(false); // collapse all
 
 Note that this method doesn’t expand items that have [on-demand loading](#cbxtreesubtreeprovider) behavior. Also, programmatic toggling doesn’t trigger the [`cbxtreetoggle` event](#cbxtreetoggle-1).
 
+### `CbxTree.toggleChecked()`
+
+This method can be used to check or uncheck all the items in the tree. The method accepts an optional boolean argument, `checked`, which controls whether items should be checked (`true`) or unchecked (`false`).
+
+```javascript
+const readingList = document.querySelector('[name="reading-list[]"]');
+readingList.toggleChecked(true); // check all
+```
+
+Note that programmatic checking of the items doesn’t trigger the [`cbxtreechange` event](#cbxtreechange).
+
 ### `CbxTree.toJSON()`
 
 Returns the current state of the tree in the same format as the array used for tree initialisation. This method allows for JSON serialisation of the control state. 
@@ -340,7 +351,7 @@ The available `::part()` pseudo-elements are listed in the following table and a
 | `::part(icon)`     | Any item’s icon                                      |
 | `::part(title)`    | Any item’s title                                     |
 
-![Tree parts that can be styled using the ::part() selector](./docs/parts.png)
+![Tree parts that can be styled using the ::part() selector](./doc-assets/parts.png)
 
 ```css
 cbx-tree::part(title) {

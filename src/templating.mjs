@@ -23,8 +23,18 @@ export const itemTemplate = ({id, title, icon, collapsed, children}) => `
   ${(children !== undefined) ? '<button type="button" part="toggle"></button>' : ''}
   <label part="label">
     <input type="checkbox" id="cbx_${id}" part="checkbox">
-    ${icon ? `<img src="${sanitize(icon)}" alt="" part="icon">` : ''}
+    ${iconTemplate(icon)}
     <span part="title">${title}</span>
   </label>
   ${(children?.size > 0) ? treeTemplate(children, false) : ''}
 </li>`;
+
+const iconTemplate = (icon) => {
+  if (!icon) {
+    return '';
+  }
+  if (icon.startsWith('<svg ') && icon.endsWith('</svg>')) {
+    return '<svg part="icon"' + icon.slice(4);
+  }
+  return `<img src="${sanitize(icon)}" alt="" part="icon">`;
+};

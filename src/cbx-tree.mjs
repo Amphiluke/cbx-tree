@@ -149,10 +149,8 @@ export default class CbxTree extends HTMLElement {
     // Order of synchronisation matters (descendants first, then ancestors)
     this.#syncDescendants(item);
     this.#syncAncestors(item);
-    const data = this.formData;
-    this.#internals.setFormValue(data, JSON.stringify(this));
-    // N.B.: According to spec, setFormValue() clones FormData so it’s safe to pass data by reference in event’s detail
-    this.dispatchEvent(new CustomEvent('cbxtreechange', {bubbles: true, detail: data}));
+    this.#refreshFormValue();
+    this.dispatchEvent(new CustomEvent('cbxtreechange', {bubbles: true, detail: this.formData}));
   }
 
   #onItemToggle({target}) {
@@ -168,7 +166,7 @@ export default class CbxTree extends HTMLElement {
     }
     const item = this.#getItem(id);
     item.collapsed = !isExpanding;
-    this.#internals.setFormValue(this.formData, JSON.stringify(this));
+    this.#refreshFormValue();
     this.dispatchEvent(new CustomEvent('cbxtreetoggle', {bubbles: true, detail: {
       title: item.title,
       value: item.value,
@@ -247,7 +245,7 @@ export default class CbxTree extends HTMLElement {
     }
     itemElement.insertAdjacentHTML('beforeend', treeTemplate(parentItem.children, false));
     this.#syncDescendants(parentItem);
-    this.#internals.setFormValue(this.formData, JSON.stringify(this));
+    this.#refreshFormValue();
   }
 
   /**
@@ -280,22 +278,32 @@ export default class CbxTree extends HTMLElement {
   }
 
   /**
-   * Sync selection states of the item’s descendants
-   * @param {CbxTreeItem} item 
+   * Check/uncheck all items of a the tree or a subtree
+   * @param {boolean} isChecked
+   * @param {CbxTreeMap} tree
    */
-  #syncDescendants(item) {
-    if (!item.children) {
+  #setAllChecked(isChecked, tree) {
+    if (!tree?.size) {
       return;
     }
-    const isChecked = this.#selection.has(item.id);
     const method = isChecked ? 'add' : 'delete';
-    item.children.forEach((childItem, id) => {
+    tree.forEach((item, id) => {
       this.#selection[method](id);
       const checkbox = this.#shadowRoot.getElementById(`cbx_${id}`);
       checkbox.checked = isChecked;
       checkbox.indeterminate = false;
-      this.#syncDescendants(childItem);
+      this.#setAllChecked(isChecked, item.children);
     });
+  }
+
+  /**
+   * Sync selection states of the item’s descendants
+   * @param {CbxTreeItem} item 
+   */
+  #syncDescendants(item) {
+    if (item.children) {
+      this.#setAllChecked(this.#selection.has(item.id), item.children);
+    }
   }
 
   /**
@@ -313,6 +321,10 @@ export default class CbxTree extends HTMLElement {
     checkbox.checked = state === 'checked';
     checkbox.indeterminate = state === 'indeterminate';
     this.#syncAncestors(parentItem);
+  }
+
+  #refreshFormValue() {
+    this.#internals.setFormValue(this.formData, JSON.stringify(this));
   }
 
   /** @returns {CbxRawTreeItem[]} */
@@ -356,11 +368,23 @@ export default class CbxTree extends HTMLElement {
     this.#selection.clear();
     this.#tree = this.#buildTree(treeData);
     this.#render();
-    this.#internals.setFormValue(this.formData, JSON.stringify(this));
+    this.#refreshFormValue();
   }
 
   toJSON() {
     return this.#toRaw();
+  }
+
+  /**
+   * Check or uncheck all the items in the tree
+   * @param {boolean} [checked] - Whether to check (`true`) or uncheck (`false`) all the items
+   */
+  toggleChecked(checked) {
+    if (checked === undefined) {
+      checked = !!this.#shadowRoot.querySelector('[part="checkbox"]:not(:checked)');
+    }
+    this.#setAllChecked(checked, this.#tree);
+    this.#refreshFormValue();
   }
 
   /**
@@ -381,7 +405,7 @@ export default class CbxTree extends HTMLElement {
       const item = this.#getItem(unprefixId(itemElement.id));
       item.collapsed = !isExpanding;
     });
-    this.#internals.setFormValue(this.formData, JSON.stringify(this));
+    this.#refreshFormValue();
   }
 
 

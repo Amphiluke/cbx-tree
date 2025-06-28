@@ -7,9 +7,13 @@ export default defineConfig([
   {
     files: [
       'src/**/*.{js,mjs,cjs}',
+      'docs/**/*.mjs',
       'eslint.config.mjs',
       'rollup.config.mjs',
       'vite.config.mjs',
+    ],
+    ignores: [
+      'docs/cbx-tree.mjs',
     ],
     languageOptions: {
       ecmaVersion: 2025,
