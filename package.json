@@ -35,7 +35,7 @@
   "bugs": {
     "url": "https://github.com/Amphiluke/cbx-tree/issues"
   },
-  "homepage": "https://github.com/Amphiluke/cbx-tree#readme",
+  "homepage": "https://amphiluke.github.io/cbx-tree/",
   "devDependencies": {
     "@eslint/js": "^9.30.0",
     "@stylistic/eslint-plugin": "^5.0.0",
