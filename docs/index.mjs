@@ -1,26 +1,38 @@
-import {treeData} from './tree-data.mjs';
+import {treeData, vaultData} from './tree-data.mjs';
 import * as icons from './icons.mjs';
 
 const processTree = (tree, valuePrefix = '') => {
   tree.forEach((item) => {
-    item.value = valuePrefix ? `${valuePrefix} / ${item.title}` : item.title;
+    const title = item.title.replace(/<[^>]+>/g, '');
+    item.value = valuePrefix ? `${valuePrefix}/${title}` : title;
     if (item.children === undefined) {
-      const [, extension] = item.title.split('.');
+      const [, extension] = title.split('.');
       item.icon = (extension in icons) ? icons[extension] : icons.file;
       return;
     }
-    item.icon = icons.folder;
+    item.icon = item.children ? icons.folder : icons.safe;
     item.collapsed = true;
-    processTree(item.children, item.value);
+    if (item.children !== null) {
+      processTree(item.children, item.value);
+    }
   });
 };
 
 const fileStructure = structuredClone(treeData);
 processTree(fileStructure);
+const valutStructure = structuredClone(vaultData);
+processTree(valutStructure, 'vault [remote]');
 
 customElements.whenDefined('cbx-tree').then(() => {
   const tree = document.getElementById('file-tree');
   tree.setData(fileStructure);
+  tree.subtreeProvider = async (value) => {
+    await new Promise((resolve) => setTimeout(resolve, 1000 + Math.round(Math.random() * 2000)));
+    const [, valutSubdir] = value.split('/');
+    return valutSubdir ?
+      valutStructure.find(({title}) => title === valutSubdir).children :
+      valutStructure.map((subdir) => ({...subdir, children: null}));
+  };
 
   const setValidity = (isValid) => tree.setValidity({valueMissing: !isValid}, 'At least one file must be selected');
   setValidity(false);

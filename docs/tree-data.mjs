@@ -335,4 +335,37 @@ export const treeData = [
       },
     ],
   },
+  {
+    title: 'valut <b>[remote]</b>',
+    children: null,
+  },
+];
+
+export const vaultData = [
+  {
+    title: 'certificates',
+    children: [
+      {title: 'developer_certs.zip'},
+      {title: 'testing_certs.zip'},
+      {title: 'production_certs.zip'},
+      {title: 'README.txt'},
+    ],
+  },
+  {
+    title: 'configs',
+    children: [
+      {title: 'default_settings.json'},
+      {title: 'environment_vars.txt'},
+      {title: 'params_v1.zip'},
+      {title: 'params_v2.zip'},
+    ],
+  },
+  {
+    title: 'keys',
+    children: [
+      {title: 'deploy_keys.zip'},
+      {title: 'README.txt'},
+      {title: 'rest_api.txt'},
+    ],
+  },
 ];
