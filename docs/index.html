@@ -18,7 +18,7 @@
   <h1><code>&lt;cbx-tree&gt;</code>: The Checkbox Tree element</h1>
   <form action="." id="archive-form" class="archive-form">
     <div class="archive-head">
-      <h2>Select files/directories to archive</h2>
+      <h2>Select files/directories</h2>
       <button type="button" id="toggle-all-btn" title="Expand/collapse all">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="1lh" height="1lh" fill="currentColor">
           <path d="M3.65 9.15a.5.5 0 0 1 .7 0L8 12.79l3.65-3.64a.5.5 0 0 1 .7.7l-4 4a.5.5 0 0 1-.7 0l-4-4a.5.5 0 0 1 0-.7m0-2.3a.5.5 0 0 0 .7 0L8 3.21l3.65 3.64a.5.5 0 0 0 .7-.7l-4-4a.5.5 0 0 0-.7 0l-4 4a.5.5 0 0 0 0 .7"/>
@@ -30,8 +30,13 @@
         </svg>
       </button>
     </div>
-    <cbx-tree id="file-tree" name="files[]"></cbx-tree>
-    <button type="submit" class="archive-btn">Archive selected</button>
+    <cbx-tree id="file-tree" name="files[]" data-theme="system"></cbx-tree>
+    <div class="archive-foot">
+      <button type="submit" class="archive-btn">Archive selected</button>
+      Theme:
+      <label><input type="radio" name="theme" value="system" checked> System</label>
+      <label><input type="radio" name="theme" value="custom"> Custom</label>
+    </div>
     <div id="archive-popover" class="archive-popover" popover></div>
   </form>
   <footer class="footer">

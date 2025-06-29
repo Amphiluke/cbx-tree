@@ -23,8 +23,10 @@ processTree(fileStructure);
 const valutStructure = structuredClone(vaultData);
 processTree(valutStructure, 'vault [remote]');
 
+const form = document.getElementById('archive-form');
+const tree = document.getElementById('file-tree');
+
 customElements.whenDefined('cbx-tree').then(() => {
-  const tree = document.getElementById('file-tree');
   tree.setData(fileStructure);
   tree.subtreeProvider = async (value) => {
     await new Promise((resolve) => setTimeout(resolve, 1000 + Math.round(Math.random() * 2000)));
@@ -47,9 +49,20 @@ customElements.whenDefined('cbx-tree').then(() => {
   });
 });
 
+const theme = localStorage.getItem('cbx-tree_theme') || 'system';
+form.elements.namedItem('theme').value = theme;
+tree.setAttribute('data-theme', theme);
+form.addEventListener('change', ({target}) => {
+  if (target.name === 'theme') {
+    tree.setAttribute('data-theme', target.value);
+    localStorage.setItem('cbx-tree_theme', target.value);
+  }
+});
+
 const files = new URLSearchParams(location.search).getAll('files[]');
 if (files.length) {
   const popover = document.getElementById('archive-popover');
   popover.textContent = `Files have been successfully archived:\n\n${files.join('\n')}`;
   popover.showPopover();
+  history.replaceState(null, '', location.pathname);
 }

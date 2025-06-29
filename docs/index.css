@@ -82,8 +82,30 @@ cbx-tree::part(icon) {
   width: 1em;
 }
 
+cbx-tree[data-theme='custom'] {
+  --cbx-tree-toggle-closed-mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" width="14" height="14"><path d="M3 7L11 7M7 3L7 11" stroke="black"/></svg>');
+  --cbx-tree-toggle-open-mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" width="14" height="14"><path d="M3 7L11 7" stroke="black"/></svg>');
+  --cbx-tree-nesting-indent: 1.3em;
+  --cbx-tree-label-hover-bg: rgb(from SelectedItem r g b / 0.2);
+  --cbx-tree-label-hover-fg: currentColor;
+
+  &::part(item) {
+    --line-color: rgb(from currentColor r g b / 0.3);
+    background: linear-gradient(0deg, #0000 0.5lh, var(--line-color) 0, var(--line-color) calc(100% - 1.5lh), #0000 0) 0.5em 0 no-repeat;
+    background-size: 1px auto;
+  }
+}
+
+.archive-foot {
+  display: flex;
+  
+  @media (width > 400px) {
+    gap: 0.8ch;
+  }
+}
+
 .archive-btn {
-  align-self: start;
+  margin-inline-end: auto;
 }
 
 .archive-popover {
