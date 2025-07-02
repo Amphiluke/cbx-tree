@@ -83,7 +83,7 @@ export default class CbxTree extends HTMLElement {
   }
   set disabled(value) {
     if (value) {
-      this.setAttribute('disabled', value);
+      this.setAttribute('disabled', '');
     } else {
       this.removeAttribute('disabled');
     }
@@ -116,8 +116,7 @@ export default class CbxTree extends HTMLElement {
   // === Lifecycle callbacks ===
 
   formDisabledCallback(disabled) {
-    const controls = this.#shadowRoot.querySelectorAll('button, input');
-    [...controls].forEach((ctrl) => ctrl.disabled = disabled);
+    this.#setControlsDisabled(disabled);
   }
 
   formResetCallback() {
@@ -244,6 +243,9 @@ export default class CbxTree extends HTMLElement {
       return;
     }
     itemElement.insertAdjacentHTML('beforeend', treeTemplate(parentItem.children, false));
+    if (this.disabled) {
+      this.#setControlsDisabled(true, itemElement);
+    }
     this.#syncDescendants(parentItem);
     this.#refreshFormValue();
   }
@@ -294,6 +296,16 @@ export default class CbxTree extends HTMLElement {
       checkbox.indeterminate = false;
       this.#setAllChecked(isChecked, item.children);
     });
+  }
+
+  /**
+   * Update the `disabled` property on the controls in the specified container
+   * @param {boolean} isDisabled
+   * @param {HTMLElement | ShadowRoot} [container]
+   */
+  #setControlsDisabled(isDisabled, container = this.#shadowRoot) {
+    const controls = container.querySelectorAll('button, input');
+    [...controls].forEach((ctrl) => ctrl.disabled = isDisabled);
   }
 
   /**
