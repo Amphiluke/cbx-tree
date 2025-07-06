@@ -51,6 +51,24 @@ export default class CbxTree extends HTMLElement {
   /** @type {Set<string>} */
   #selection = new Set();
 
+  /** @type {HTMLLabelElement | null} */
+  get #focusedLabel() {
+    return this.#shadowRoot.querySelector('[tabindex="0"]');
+  }
+  set #focusedLabel(newLabel) {
+    const prevLabel = this.#focusedLabel;
+    if (newLabel === prevLabel) {
+      return;
+    }
+    prevLabel?.removeAttribute('tabindex');
+    newLabel?.setAttribute('tabindex', '0');
+  }
+
+  /** @type {HTMLLabelElement[]} */
+  get #visibleLabels() {
+    return [...this.#shadowRoot.querySelectorAll('[part="label"]:not([aria-expanded="false"] [part="tree"] *)')];
+  }
+
   /** @type {((parentValue: string) => Promise<CbxRawTreeItem[]>) | null} */
   subtreeProvider = null;
 
@@ -110,6 +128,8 @@ export default class CbxTree extends HTMLElement {
 
     this.#shadowRoot.addEventListener('change', (e) => this.#onChange(e));
     this.#shadowRoot.addEventListener('click', (e) => this.#onItemToggle(e));
+    this.addEventListener('focus', () => this.#onFocus());
+    this.#shadowRoot.addEventListener('keydown', (e) => this.#onKeyDown(e));
   }
 
 
@@ -138,39 +158,77 @@ export default class CbxTree extends HTMLElement {
   // === Event listeners ===
 
   #onChange({target}) {
-    if (!target.part.contains('checkbox')) {
+    if (target.part.contains('checkbox')) {
+      this.#toggleItemChecked(target);
       return;
     }
-    const id = unprefixId(target.id);
-    const method = target.checked ? 'add' : 'delete';
-    this.#selection[method](id);
-    const item = this.#getItem(id);
-    // Order of synchronisation matters (descendants first, then ancestors)
-    this.#syncDescendants(item);
-    this.#syncAncestors(item);
-    this.#refreshFormValue();
-    this.dispatchEvent(new CustomEvent('cbxtreechange', {bubbles: true, detail: this.formData}));
   }
 
   #onItemToggle({target}) {
-    if (!target.part.contains('toggle')) {
+    if (target.part.contains('toggle')) {
+      this.#toggleItem(target.closest('[part="item"]'));
+    }
+  }
+
+  #onFocus() {
+    this.#focusedLabel?.focus();
+  }
+
+  #onKeyDown(e) {
+    if (e.defaultPrevented || this.disabled) {
       return;
     }
-    const itemElement = target.closest('[part="item"]');
-    const isExpanding = itemElement.ariaExpanded !== 'true';
-    itemElement.ariaExpanded = isExpanding ? 'true' : 'false';
-    const id = unprefixId(itemElement.id);
-    if (isExpanding) {
-      this.#requestSubtree(id);
+    switch (e.key) {
+      case 'ArrowRight': {
+        const item = this.#focusedLabel?.closest('[part="item"]');
+        if (item?.ariaExpanded === 'true') {
+          this.#focusNext();
+        } else if (item?.ariaExpanded === 'false') {
+          this.#toggleItem(item);
+        }
+        break;
+      }
+      case 'ArrowLeft': {
+        const item = this.#focusedLabel?.closest('[part="item"]');
+        if (item?.ariaExpanded === 'true') {
+          this.#toggleItem(item);
+        } else {
+          this.#focusParent();
+        }
+        break;
+      }
+      case 'ArrowDown':
+        this.#focusNext();
+        break;
+      case 'ArrowUp':
+        this.#focusPrev();
+        break;
+      case 'Home':
+        this.#focusFirst();
+        break;
+      case 'End':
+        this.#focusLast();
+        break;
+      case 'Enter': {
+        const item = this.#focusedLabel?.closest('[part="item"]');
+        if (item.ariaExpanded !== 'undefined') {
+          this.#toggleItem(item);
+        }
+        break;
+      }
+      case ' ': {
+        const checkbox = this.#focusedLabel?.querySelector('[part="checkbox"]');
+        if (checkbox) {
+          checkbox.checked = !checkbox.checked;
+          checkbox.indeterminate = false;
+          this.#toggleItemChecked(checkbox);
+        }
+        break;
+      }
+      default:
+        return;
     }
-    const item = this.#getItem(id);
-    item.collapsed = !isExpanding;
-    this.#refreshFormValue();
-    this.dispatchEvent(new CustomEvent('cbxtreetoggle', {bubbles: true, detail: {
-      title: item.title,
-      value: item.value,
-      newState: isExpanding ? 'expanded' : 'collapsed',
-    }}));
+    e.preventDefault();
   }
 
 
@@ -184,6 +242,7 @@ export default class CbxTree extends HTMLElement {
       checkbox.checked = state === 'checked';
       checkbox.indeterminate = state === 'indeterminate';
     });
+    this.#focusedLabel = this.#shadowRoot.querySelector('[part="label"]');
   }
 
   /**
@@ -337,6 +396,116 @@ export default class CbxTree extends HTMLElement {
 
   #refreshFormValue() {
     this.#internals.setFormValue(this.formData, JSON.stringify(this));
+  }
+
+  /**
+   * Toggle the item’s checked state based on the checkbox current state
+   * @param {HTMLInputElement} checkbox
+   */
+  #toggleItemChecked(checkbox) {
+    const id = unprefixId(checkbox.id);
+    const method = checkbox.checked ? 'add' : 'delete';
+    this.#selection[method](id);
+    const item = this.#getItem(id);
+    // Order of synchronisation matters (descendants first, then ancestors)
+    this.#syncDescendants(item);
+    this.#syncAncestors(item);
+    this.#refreshFormValue();
+    this.dispatchEvent(new CustomEvent('cbxtreechange', {bubbles: true, detail: this.formData}));
+  }
+
+  /**
+   * Expand the item if it is collapsed or collapse if it is expanded
+   * @param {HTMLLIElement} itemElement
+   */
+  #toggleItem(itemElement) {
+    const isExpanding = itemElement.ariaExpanded !== 'true';
+    itemElement.ariaExpanded = isExpanding ? 'true' : 'false';
+    const id = unprefixId(itemElement.id);
+    if (isExpanding) {
+      this.#requestSubtree(id);
+    }
+    const item = this.#getItem(id);
+    item.collapsed = !isExpanding;
+    this.#focusedLabel = itemElement.querySelector('[part="label"]');
+    this.#refreshFormValue();
+    this.dispatchEvent(new CustomEvent('cbxtreetoggle', {bubbles: true, detail: {
+      title: item.title,
+      value: item.value,
+      newState: isExpanding ? 'expanded' : 'collapsed',
+    }}));
+  }
+
+  /**
+   * Apply focus to the first item in the tree
+   */
+  #focusFirst() {
+    const firstLabel = this.#shadowRoot.querySelector('[part="label"]');
+    if (firstLabel) {
+      this.#focusedLabel = firstLabel;
+      firstLabel.focus();
+    }
+  }
+
+  /**
+   * Apply focus to the last visible item in the tree
+   */
+  #focusLast() {
+    const lastLabel = this.#visibleLabels.at(-1);
+    if (lastLabel) {
+      this.#focusedLabel = lastLabel;
+      lastLabel.focus();
+    }
+  }
+
+  /**
+   * Move focus to the next visible item in the tree
+   */
+  #focusNext() {
+    const currentLabel = this.#focusedLabel;
+    if (!currentLabel) {
+      this.#focusFirst();
+      return;
+    }
+    const visibleLabels = this.#visibleLabels;
+    const nextLabel = visibleLabels[visibleLabels.indexOf(currentLabel) + 1];
+    if (nextLabel) {
+      this.#focusedLabel = nextLabel;
+      nextLabel.focus();
+    }
+  }
+
+  /**
+   * Move focus to the previous visible item in the tree
+   */
+  #focusPrev() {
+    const currentLabel = this.#focusedLabel;
+    if (!currentLabel) {
+      this.#focusFirst();
+      return;
+    }
+    const visibleLabels = this.#visibleLabels;
+    const prevLabel = visibleLabels[visibleLabels.indexOf(currentLabel) - 1];
+    if (prevLabel) {
+      this.#focusedLabel = prevLabel;
+      prevLabel.focus();
+    }
+  }
+
+  /**
+   * Move focus one level up, to the parent item
+   */
+  #focusParent() {
+    const currentLabel = this.#focusedLabel;
+    if (!currentLabel) {
+      this.#focusFirst();
+      return;
+    }
+    const parentLabel = currentLabel.closest('[part="tree"]').closest('[part="item"]')?.querySelector('[part="label"]');
+    if (parentLabel) {
+      this.#focusedLabel = parentLabel;
+      parentLabel.focus();
+    }
   }
 
   /** @returns {CbxRawTreeItem[]} */

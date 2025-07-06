@@ -20,9 +20,9 @@ export const treeTemplate = (tree, isRoot = true) => `
  */
 export const itemTemplate = ({id, title, icon, collapsed, children}) => `
 <li id="item_${id}" part="item" role="treeitem" aria-expanded="${collapsed === undefined ? 'undefined' : !collapsed}">
-  ${(children !== undefined) ? '<button type="button" part="toggle"></button>' : ''}
+  ${(children !== undefined) ? '<button type="button" part="toggle" tabindex="-1"></button>' : ''}
   <label part="label">
-    <input type="checkbox" id="cbx_${id}" part="checkbox">
+    <input type="checkbox" id="cbx_${id}" part="checkbox" tabindex="-1">
     ${iconTemplate(icon)}
     <span part="title">${title}</span>
   </label>

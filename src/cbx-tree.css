@@ -78,9 +78,9 @@
     mask-image: var(--cbx-tree-toggle-pending-mask);
   }
 
-  &:where(:hover, :focus-visible)::before,
+  &:where(:hover)::before,
   &:has(+ [part='label']:hover)::before,
-  [part='item']:has(> [part='label'] :focus-visible) > &::before {
+  :host(:focus) &:has(+ [part='label'][tabindex='0'])::before {
     color: var(--cbx-tree-label-hover-fg);
   }
 }
@@ -91,12 +91,13 @@
   gap: inherit;
   grid-area: label;
   isolation: isolate;
+  outline: none;
   padding-block: 0.2em;
   position: relative;
 
   &:hover,
-  &:has(:focus-visible),
-  [part='toggle']:where(:hover, :focus-visible) + & {
+  :host(:focus) &[tabindex='0'],
+  [part='toggle']:hover + & {
     color: var(--cbx-tree-label-hover-fg);
 
     &::before {
