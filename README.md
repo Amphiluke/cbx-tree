@@ -185,6 +185,14 @@ A mandatory attribute `name` is used by the `<cbx-tree>` component to construct 
 <cbx-tree name="reading-list[]"></cbx-tree>
 ```
 
+### `nohover`
+
+By default, items in the `<cbx-tree>` component grab focus and get highlighted when pointer hovers over them, similarly to options in the `<select>` element’s dropdown. A Boolean attribute `nohover` makes the `<cbx-tree>` deactivate this behaviour, so that items only become selected when clicked or focused by keyboard navigation (similarly to options in a `<select>` with the `multiple` attribute specified).
+
+```html
+<cbx-tree name="reading-list[]" nohover></cbx-tree>
+```
+
 ## Instance properties
 
 The `CbxTree` interface also inherits properties from its parent, [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement).
@@ -211,6 +219,10 @@ console.log('Checked values:', readingList.formData.getAll('reading-list[]'));
 ### `CbxTree.name`
 
 Reflects the value of the element’s [`name` attribute](#name).
+
+### `CbxTree.noHover`
+
+Reflects the value of the element’s [`nohover` attribute](#nohover).
 
 ### `CbxTree.subtreeProvider`
 
@@ -317,8 +329,8 @@ The `<cbx-tree>` element provides a few CSS custom properties (variables) that y
 | `--cbx-tree-toggle-closed-mask`  | `<url>`¹    | Mask image for the toggle button in the collapsed state |
 | `--cbx-tree-toggle-open-mask`    | `<url>`     | Mask image for the toggle button in the expanded state  |
 | `--cbx-tree-toggle-pending-mask` | `<url>`     | Mask image for the toggle button in the pending state   |
-| `--cbx-tree-label-hover-bg`      | `<color>`²  | Background color for the highlighted item’s label       |
-| `--cbx-tree-label-hover-fg`      | `<color>`   | Text color for the highlighted item’s label             |
+| `--cbx-tree-label-focus-bg`      | `<color>`²  | Background color for the highlighted item’s label       |
+| `--cbx-tree-label-focus-fg`      | `<color>`   | Text color for the highlighted item’s label             |
 | `--cbx-tree-nesting-indent`      | `<length>`³ | Indentation size for nested subtrees                    |
 
 ¹ https://developer.mozilla.org/en-US/docs/Web/CSS/url_value \

@@ -3,8 +3,8 @@
   --cbx-tree-toggle-open-mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 8" width="14" height="8"><path d="M2.5 1.5h9L7 7z"/></svg>');
   --cbx-tree-toggle-pending-mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" width="14" height="14"><path d="M7 1A6 6 0 1 1 1 7" fill="none" stroke="black" stroke-width="2"><animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0 7 7" to="360 7 7" dur="1s" repeatCount="indefinite"/></path></svg>');
 
-  --cbx-tree-label-hover-bg: SelectedItem;
-  --cbx-tree-label-hover-fg: SelectedItemText;
+  --cbx-tree-label-focus-bg: SelectedItem;
+  --cbx-tree-label-focus-fg: SelectedItemText;
 
   --cbx-tree-nesting-indent: 1em;
 }
@@ -78,10 +78,8 @@
     mask-image: var(--cbx-tree-toggle-pending-mask);
   }
 
-  &:where(:hover)::before,
-  &:has(+ [part='label']:hover)::before,
-  :host(:focus) &:has(+ [part='label'][tabindex='0'])::before {
-    color: var(--cbx-tree-label-hover-fg);
+  &:has(+ [part='label']:focus)::before {
+    color: var(--cbx-tree-label-focus-fg);
   }
 }
 
@@ -95,13 +93,11 @@
   padding-block: 0.2em;
   position: relative;
 
-  &:hover,
-  :host(:focus) &[tabindex='0'],
-  [part='toggle']:hover + & {
-    color: var(--cbx-tree-label-hover-fg);
+  &:focus {
+    color: var(--cbx-tree-label-focus-fg);
 
     &::before {
-      background: var(--cbx-tree-label-hover-bg);
+      background: var(--cbx-tree-label-focus-bg);
     }
   }
 

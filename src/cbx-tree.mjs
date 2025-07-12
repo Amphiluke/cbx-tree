@@ -39,6 +39,10 @@ export default class CbxTree extends HTMLElement {
     return true;
   }
 
+  static get observedAttributes() {
+    return ['nohover'];
+  }
+
   /** @type {ShadowRoot} */
   #shadowRoot;
 
@@ -50,6 +54,9 @@ export default class CbxTree extends HTMLElement {
 
   /** @type {Set<string>} */
   #selection = new Set();
+
+  /** @type {AbortController | null} */
+  #hoverEventCtrl = null;
 
   /** @type {HTMLLabelElement | null} */
   get #focusedLabel() {
@@ -107,6 +114,17 @@ export default class CbxTree extends HTMLElement {
     }
   }
 
+  get noHover() {
+    return this.hasAttribute('nohover');
+  }
+  set noHover(value) {
+    if (value) {
+      this.setAttribute('nohover', '');
+    } else {
+      this.removeAttribute('nohover');
+    }
+  }
+
   get type() {
     return this.localName;
   }
@@ -130,10 +148,17 @@ export default class CbxTree extends HTMLElement {
     this.#shadowRoot.addEventListener('click', (e) => this.#onItemToggle(e));
     this.addEventListener('focus', () => this.#onFocus());
     this.#shadowRoot.addEventListener('keydown', (e) => this.#onKeyDown(e));
+    this.#toggleHoverListener();
   }
 
 
   // === Lifecycle callbacks ===
+
+  attributeChangedCallback(name) {
+    if (name === 'nohover') {
+      this.#toggleHoverListener();
+    }
+  }
 
   formDisabledCallback(disabled) {
     this.#setControlsDisabled(disabled);
@@ -160,6 +185,8 @@ export default class CbxTree extends HTMLElement {
   #onChange({target}) {
     if (target.part.contains('checkbox')) {
       this.#toggleItemChecked(target);
+      const label = target.closest('[part="label"]');
+      this.#focusLabel(label, true);
       return;
     }
   }
@@ -203,6 +230,12 @@ export default class CbxTree extends HTMLElement {
       case 'ArrowUp':
         this.#focusPrev();
         break;
+      case 'PageDown':
+        this.#focusNextPage();
+        break;
+      case 'PageUp':
+        this.#focusPrevPage();
+        break;
       case 'Home':
         this.#focusFirst();
         break;
@@ -231,8 +264,23 @@ export default class CbxTree extends HTMLElement {
     e.preventDefault();
   }
 
+  #onPointerOver({target}) {
+    const label = target.closest('[part="label"]');
+    this.#focusLabel(label, true);
+  }
+
 
   // === Internals ===
+
+  #toggleHoverListener() {
+    this.#hoverEventCtrl?.abort();
+    if (this.noHover) {
+      this.#hoverEventCtrl = null;
+      return;
+    }
+    this.#hoverEventCtrl = new AbortController();
+    this.#shadowRoot.addEventListener('pointerover', (e) => this.#onPointerOver(e), {signal: this.#hoverEventCtrl.signal});
+  }
 
   #render() {
     this.#shadowRoot.setHTMLUnsafe(treeTemplate(this.#tree));
@@ -436,15 +484,19 @@ export default class CbxTree extends HTMLElement {
     }}));
   }
 
+  #focusLabel(label, preventScroll = false) {
+    if (label) {
+      this.#focusedLabel = label;
+      label.focus({preventScroll});
+    }
+  }
+
   /**
    * Apply focus to the first item in the tree
    */
   #focusFirst() {
     const firstLabel = this.#shadowRoot.querySelector('[part="label"]');
-    if (firstLabel) {
-      this.#focusedLabel = firstLabel;
-      firstLabel.focus();
-    }
+    this.#focusLabel(firstLabel);
   }
 
   /**
@@ -452,10 +504,7 @@ export default class CbxTree extends HTMLElement {
    */
   #focusLast() {
     const lastLabel = this.#visibleLabels.at(-1);
-    if (lastLabel) {
-      this.#focusedLabel = lastLabel;
-      lastLabel.focus();
-    }
+    this.#focusLabel(lastLabel);
   }
 
   /**
@@ -469,10 +518,7 @@ export default class CbxTree extends HTMLElement {
     }
     const visibleLabels = this.#visibleLabels;
     const nextLabel = visibleLabels[visibleLabels.indexOf(currentLabel) + 1];
-    if (nextLabel) {
-      this.#focusedLabel = nextLabel;
-      nextLabel.focus();
-    }
+    this.#focusLabel(nextLabel);
   }
 
   /**
@@ -486,10 +532,47 @@ export default class CbxTree extends HTMLElement {
     }
     const visibleLabels = this.#visibleLabels;
     const prevLabel = visibleLabels[visibleLabels.indexOf(currentLabel) - 1];
-    if (prevLabel) {
-      this.#focusedLabel = prevLabel;
-      prevLabel.focus();
+    this.#focusLabel(prevLabel);
+  }
+
+  /**
+   * Move focus one page down
+   */
+  #focusNextPage() {
+    const {clientHeight, scrollHeight} = this;
+    if (scrollHeight - clientHeight < 10) {
+      this.#focusLast();
+      return;
     }
+    const visibleLabels = this.#visibleLabels;
+    const labelHeight = scrollHeight / visibleLabels.length;
+    const pageSize = Math.floor(clientHeight / labelHeight);
+    let currentIndex = visibleLabels.indexOf(this.#focusedLabel);
+    if (currentIndex === -1) {
+      currentIndex = 0;
+    }
+    const nextIndex = Math.min(currentIndex + pageSize - 1, visibleLabels.length - 1);
+    this.#focusLabel(visibleLabels[nextIndex]);
+  }
+
+  /**
+   * Move focus one page up
+   */
+  #focusPrevPage() {
+    const {clientHeight, scrollHeight} = this;
+    if (scrollHeight - clientHeight < 10) {
+      this.#focusFirst();
+      return;
+    }
+    const visibleLabels = this.#visibleLabels;
+    const labelHeight = scrollHeight / visibleLabels.length;
+    const pageSize = Math.round(clientHeight / labelHeight);
+    let currentIndex = visibleLabels.indexOf(this.#focusedLabel);
+    if (currentIndex === -1) {
+      currentIndex = 0;
+    }
+    const nextIndex = Math.max(currentIndex - pageSize + 1, 0);
+    this.#focusLabel(visibleLabels[nextIndex]);
   }
 
   /**
@@ -502,10 +585,7 @@ export default class CbxTree extends HTMLElement {
       return;
     }
     const parentLabel = currentLabel.closest('[part="tree"]').closest('[part="item"]')?.querySelector('[part="label"]');
-    if (parentLabel) {
-      this.#focusedLabel = parentLabel;
-      parentLabel.focus();
-    }
+    this.#focusLabel(parentLabel);
   }
 
   /** @returns {CbxRawTreeItem[]} */
