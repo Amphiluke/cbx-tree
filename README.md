@@ -187,7 +187,7 @@ A mandatory attribute `name` is used by the `<cbx-tree>` component to construct 
 
 ### `nohover`
 
-By default, items in the `<cbx-tree>` component grab focus and get highlighted when pointer hovers over them, similarly to options in the `<select>` element’s dropdown. A Boolean attribute `nohover` makes the `<cbx-tree>` deactivate this behaviour, so that items only become selected when clicked or focused by keyboard navigation (similarly to options in a `<select>` with the `multiple` attribute specified).
+By default, items in the `<cbx-tree>` component grab focus and get highlighted when pointer hovers over them, similarly to options in the `<select>` element’s dropdown. A Boolean attribute `nohover` makes the `<cbx-tree>` component deactivate this behaviour, so that items only become selected when clicked or focused by keyboard navigation (similarly to options in a `<select>` with the `multiple` attribute specified).
 
 ```html
 <cbx-tree name="reading-list[]" nohover></cbx-tree>

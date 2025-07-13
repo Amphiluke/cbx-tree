@@ -1,4 +1,4 @@
-/** @import {CbxTreeItem, CbxTreeMap} from './cbx-tree.mjs' */
+/** @import {CbxTreeItem, CbxTreeMap} from './tree.mjs' */
 
 const sanitize = (unsafeStr) => ['&', '"'].reduce((str, char) => str.replaceAll(char, `&#${char.charCodeAt(0)};`), unsafeStr);
 

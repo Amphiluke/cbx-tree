@@ -1,38 +1,13 @@
+import {Tree} from './tree.mjs';
 import {treeTemplate} from './templating.mjs';
-import {unprefixId, assertRawTreeValid} from './helpers.mjs';
+import {unprefixId} from './helpers.mjs';
 import css from './cbx-tree.css?inline';
+
+/** @import {CbxRawTreeItem, CbxTreeItem, CbxTreeMap} from './tree.mjs' */
 
 const stylesheet = new CSSStyleSheet();
 stylesheet.replaceSync(css);
 
-
-/**
- * Raw user-defined data for a single item of the tree
- * @typedef {object} CbxRawTreeItem
- * @property {string} title - Item title
- * @property {string} value - Item checkbox’s value, unique within the entire tree
- * @property {string} [icon] - Item icon’s URL
- * @property {boolean} [checked] - Item selection state
- * @property {boolean} [collapsed] - Whether a children subtree is collapsed
- * @property {CbxRawTreeItem[] | null} [children] - A list of child items, or `null` if subtree isn’t fetched yet
- */
-
-/**
- * Internal representation for a single item of the tree
- * @typedef {object} CbxTreeItem
- * @property {string} id - Item identifier, unique within the entire tree
- * @property {string} title - Item title
- * @property {string} value - Item checkbox’s value, unique within the entire tree
- * @property {string} [icon] - Item icon’s URL
- * @property {'checked' | 'unchecked' | 'indeterminate'} state - Computed state of the item’s selection
- * @property {boolean} [collapsed] - Whether a children subtree is collapsed
- * @property {CbxTreeMap | null} [children] - A map of child items, or `null` if subtree isn’t fetched yet
- */
-
-/**
- * Map ids to corresponding tree items
- * @typedef {Map<string, CbxTreeItem>} CbxTreeMap
- */
 
 export default class CbxTree extends HTMLElement {
   static get formAssociated() {
@@ -49,11 +24,8 @@ export default class CbxTree extends HTMLElement {
   /** @type {ElementInternals} */
   #internals;
 
-  /** @type {CbxTreeMap} */
-  #tree = new Map();
-
-  /** @type {Set<string>} */
-  #selection = new Set();
+  /** @type {Tree} */
+  #tree;
 
   /** @type {AbortController | null} */
   #hoverEventCtrl = null;
@@ -83,8 +55,8 @@ export default class CbxTree extends HTMLElement {
   get formData() {
     const data = new FormData();
     const {name} = this;
-    this.#selection.forEach((id) => {
-      const value = this.#getItem(id)?.value;
+    this.#tree.selection.forEach((id) => {
+      const value = this.#tree.getItem(id)?.value;
       if (value !== undefined) {
         data.append(name, value);
       }
@@ -145,7 +117,7 @@ export default class CbxTree extends HTMLElement {
     }
 
     this.#shadowRoot.addEventListener('change', (e) => this.#onChange(e));
-    this.#shadowRoot.addEventListener('click', (e) => this.#onItemToggle(e));
+    this.#shadowRoot.addEventListener('pointerdown', (e) => this.#onItemToggle(e));
     this.addEventListener('focus', () => this.#onFocus());
     this.#shadowRoot.addEventListener('keydown', (e) => this.#onKeyDown(e));
     this.#toggleHoverListener();
@@ -191,9 +163,10 @@ export default class CbxTree extends HTMLElement {
     }
   }
 
-  #onItemToggle({target}) {
-    if (target.part.contains('toggle')) {
-      this.#toggleItem(target.closest('[part="item"]'));
+  #onItemToggle(event) {
+    if (event.isPrimary && event.target.part.contains('toggle')) {
+      this.#toggleItem(event.target.closest('[part="item"]'));
+      event.preventDefault(); // prevent toggle button from grabbing focus
     }
   }
 
@@ -265,7 +238,9 @@ export default class CbxTree extends HTMLElement {
   }
 
   #onPointerOver({target}) {
-    const label = target.closest('[part="label"]');
+    const label = target.part.contains('toggle') ?
+      target.closest('[part="item"]').querySelector('[part="label"]') :
+      target.closest('[part="label"]');
     this.#focusLabel(label, true);
   }
 
@@ -283,57 +258,21 @@ export default class CbxTree extends HTMLElement {
   }
 
   #render() {
-    this.#shadowRoot.setHTMLUnsafe(treeTemplate(this.#tree));
+    this.#shadowRoot.setHTMLUnsafe(treeTemplate(this.#tree.tree));
     const checkboxes = this.#shadowRoot.querySelectorAll('[part="checkbox"]');
     [...checkboxes].forEach((checkbox) => {
-      const state = this.#getItem(unprefixId(checkbox.id))?.state;
+      const state = this.#tree.getItem(unprefixId(checkbox.id))?.state;
       checkbox.checked = state === 'checked';
       checkbox.indeterminate = state === 'indeterminate';
     });
     this.#focusedLabel = this.#shadowRoot.querySelector('[part="label"]');
   }
 
-  /**
-   * Convert raw tree data to internal tree representation
-   * @param {CbxRawTreeItem[]} rawTree - Raw tree data
-   * @param {string} parentId - Identifier of a parent item (the case of building a subtree)
-   * @returns {CbxTreeMap}
-   */
-  #buildTree(rawTree, parentId) {
-    return new Map(rawTree.map((rawItem, index) => {
-      const id = parentId ? `${parentId}:${index}` : String(index);
-      if (rawItem.checked) {
-        this.#selection.add(id);
-      }
-      /** @type {CbxTreeItem} */
-      const item = {
-        id,
-        title: rawItem.title,
-        value: rawItem.value,
-        icon: rawItem.icon,
-        collapsed: rawItem.children?.length ? !!rawItem.collapsed : (rawItem.children === null ? true : undefined),
-        children: rawItem.children ? this.#buildTree(rawItem.children, id) : rawItem.children,
-      };
-      Object.defineProperty(item, 'state', {
-        get: () => {
-          if (this.#selection.has(item.id)) {
-            return 'checked';
-          }
-          if (!item.children?.size) {
-            return 'unchecked';
-          }
-          return this.#calcItemState(item);
-        },
-      });
-      return [id, item];
-    }));
-  }
-
   async #requestSubtree(parentId) {
     if (typeof this.subtreeProvider !== 'function') {
       return;
     }
-    const parentItem = this.#getItem(parentId);
+    const parentItem = this.#tree.getItem(parentId);
     if (parentItem?.children !== null) {
       return;
     }
@@ -341,8 +280,8 @@ export default class CbxTree extends HTMLElement {
     itemElement.inert = true;
     try {
       const subtree = await this.subtreeProvider(parentItem.value);
-      assertRawTreeValid(subtree);
-      parentItem.children = this.#buildTree(subtree, parentItem.id);
+      Tree.assertRawTreeValid(subtree);
+      this.#tree.setSubtree(parentItem, subtree);
     } finally {
       itemElement.inert = false;
     }
@@ -358,35 +297,6 @@ export default class CbxTree extends HTMLElement {
   }
 
   /**
-   * Get item object reference by item id
-   * @param {string} id - Item identifier
-   * @returns {CbxTreeItem | undefined}
-   */
-  #getItem(id) {
-    const parts = id.split(':');
-    return parts.slice(1).reduce((item, part) => item?.children?.get(`${item?.id}:${part}`), this.#tree.get(parts[0]));
-  }
-
-  /**
-   * Determine item state based on the states of its children
-   * @param {CbxTreeItem} item
-   * @returns {'checked' | 'unchecked' | 'indeterminate'}
-   */
-  #calcItemState(item) {
-    const childrenStates = new Set([...item.children.values()].map(({state}) => state));
-    if (childrenStates.has('indeterminate')) {
-      return 'indeterminate';
-    }
-    if (!childrenStates.has('checked')) {
-      return 'unchecked';
-    }
-    if (!childrenStates.has('unchecked')) {
-      return 'checked';
-    }
-    return 'indeterminate';
-  }
-
-  /**
    * Check/uncheck all items of a the tree or a subtree
    * @param {boolean} isChecked
    * @param {CbxTreeMap} tree
@@ -397,7 +307,7 @@ export default class CbxTree extends HTMLElement {
     }
     const method = isChecked ? 'add' : 'delete';
     tree.forEach((item, id) => {
-      this.#selection[method](id);
+      this.#tree.selection[method](id);
       const checkbox = this.#shadowRoot.getElementById(`cbx_${id}`);
       checkbox.checked = isChecked;
       checkbox.indeterminate = false;
@@ -421,7 +331,7 @@ export default class CbxTree extends HTMLElement {
    */
   #syncDescendants(item) {
     if (item.children) {
-      this.#setAllChecked(this.#selection.has(item.id), item.children);
+      this.#setAllChecked(this.#tree.selection.has(item.id), item.children);
     }
   }
 
@@ -430,12 +340,12 @@ export default class CbxTree extends HTMLElement {
    * @param {CbxTreeItem} item 
    */
   #syncAncestors(item) {
-    if (this.#tree.has(item.id)) { // top-level item
+    if (this.#tree.tree.has(item.id)) { // top-level item
       return;
     }
-    const parentItem = this.#getItem(item.id.slice(0, item.id.lastIndexOf(':')));
-    const state = this.#calcItemState(parentItem);
-    this.#selection[state === 'checked' ? 'add' : 'delete'](parentItem.id);
+    const parentItem = this.#tree.getParentItem(item.id);
+    const state = this.#tree.calcItemState(parentItem);
+    this.#tree.selection[state === 'checked' ? 'add' : 'delete'](parentItem.id);
     const checkbox = this.#shadowRoot.getElementById(`cbx_${parentItem.id}`);
     checkbox.checked = state === 'checked';
     checkbox.indeterminate = state === 'indeterminate';
@@ -453,8 +363,8 @@ export default class CbxTree extends HTMLElement {
   #toggleItemChecked(checkbox) {
     const id = unprefixId(checkbox.id);
     const method = checkbox.checked ? 'add' : 'delete';
-    this.#selection[method](id);
-    const item = this.#getItem(id);
+    this.#tree.selection[method](id);
+    const item = this.#tree.getItem(id);
     // Order of synchronisation matters (descendants first, then ancestors)
     this.#syncDescendants(item);
     this.#syncAncestors(item);
@@ -473,7 +383,7 @@ export default class CbxTree extends HTMLElement {
     if (isExpanding) {
       this.#requestSubtree(id);
     }
-    const item = this.#getItem(id);
+    const item = this.#tree.getItem(id);
     item.collapsed = !isExpanding;
     this.#focusedLabel = itemElement.querySelector('[part="label"]');
     this.#refreshFormValue();
@@ -593,28 +503,12 @@ export default class CbxTree extends HTMLElement {
     const contentJSON = this.textContent.trim() || '[]';
     try {
       const tree = JSON.parse(contentJSON);
-      assertRawTreeValid(tree);
+      Tree.assertRawTreeValid(tree);
       return tree;
     } catch {
       console.error(new DOMException('<cbx-tree> contents must be a valid JSON array representation', 'DataError'));
       return [];
     }
-  }
-
-  /**
-   * Convert internal representation of a tree back to its raw format
-   * @param {CbxTreeMap} tree
-   * @returns {CbxRawTreeItem[]}
-   */
-  #toRaw(tree = this.#tree) {
-    return [...tree.values()].map((item) => ({
-      title: item.title,
-      value: item.value,
-      icon: item.icon,
-      checked: this.#selection.has(item.id),
-      collapsed: item.collapsed === true ? true : undefined,
-      children: item.children ? this.#toRaw(item.children) : item.children,
-    }));
   }
 
 
@@ -625,15 +519,14 @@ export default class CbxTree extends HTMLElement {
    * @param {CbxRawTreeItem[]} treeData 
    */
   setData(treeData) {
-    assertRawTreeValid(treeData);
-    this.#selection.clear();
-    this.#tree = this.#buildTree(treeData);
+    Tree.assertRawTreeValid(treeData);
+    this.#tree = new Tree(treeData);
     this.#render();
     this.#refreshFormValue();
   }
 
   toJSON() {
-    return this.#toRaw();
+    return this.#tree.toRaw();
   }
 
   /**
@@ -644,7 +537,7 @@ export default class CbxTree extends HTMLElement {
     if (checked === undefined) {
       checked = !!this.#shadowRoot.querySelector('[part="checkbox"]:not(:checked)');
     }
-    this.#setAllChecked(checked, this.#tree);
+    this.#setAllChecked(checked, this.#tree.tree);
     this.#refreshFormValue();
   }
 
@@ -663,7 +556,7 @@ export default class CbxTree extends HTMLElement {
         return;
       }
       itemElement.ariaExpanded = ariaExpanded;
-      const item = this.#getItem(unprefixId(itemElement.id));
+      const item = this.#tree.getItem(unprefixId(itemElement.id));
       item.collapsed = !isExpanding;
     });
     this.#refreshFormValue();
