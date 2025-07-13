@@ -385,7 +385,7 @@ export default class CbxTree extends HTMLElement {
     }
     const item = this.#tree.getItem(id);
     item.collapsed = !isExpanding;
-    this.#focusedLabel = itemElement.querySelector('[part="label"]');
+    this.#focusLabel(itemElement.querySelector('[part="label"]'), true);
     this.#refreshFormValue();
     this.dispatchEvent(new CustomEvent('cbxtreetoggle', {bubbles: true, detail: {
       title: item.title,
