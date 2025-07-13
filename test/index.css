@@ -32,8 +32,8 @@ html {
   }
 
   cbx-tree {
-    --cbx-tree-label-hover-bg: rgb(from SaddleBrown r g b / 0.15);
-    --cbx-tree-label-hover-fg: SaddleBrown;
+    --cbx-tree-label-focus-bg: rgb(from SaddleBrown r g b / 0.15);
+    --cbx-tree-label-focus-fg: SaddleBrown;
     scrollbar-color: SaddleBrown AntiqueWhite;
   }
 }

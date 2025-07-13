@@ -11,6 +11,7 @@ export default class CbxTree extends HTMLElement {
   #private;
 
   static get formAssociated(): true;
+  static get observedAttributes(): string[];
   subtreeProvider: ((parentValue: string) => Promise<CbxRawTreeItem[]>) | null;
   get formData(): FormData;
   get form(): HTMLFormElement | null;
@@ -18,10 +19,13 @@ export default class CbxTree extends HTMLElement {
   set name(value: string);
   get disabled(): boolean;
   set disabled(value: boolean);
+  get noHover(): boolean;
+  set noHover(value: boolean);
   get type(): string;
 
   constructor();
 
+  attributeChangedCallback(name: string): void;
   formDisabledCallback(disabled: boolean): void;
   formResetCallback(): void;
   formStateRestoreCallback(state: string, mode: string): void;

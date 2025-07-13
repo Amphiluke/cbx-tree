@@ -86,8 +86,8 @@ cbx-tree[data-theme='custom'] {
   --cbx-tree-toggle-closed-mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" width="14" height="14"><path d="M3 7L11 7M7 3L7 11" stroke="black"/></svg>');
   --cbx-tree-toggle-open-mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" width="14" height="14"><path d="M3 7L11 7" stroke="black"/></svg>');
   --cbx-tree-nesting-indent: 1.3em;
-  --cbx-tree-label-hover-bg: rgb(from SelectedItem r g b / 0.2);
-  --cbx-tree-label-hover-fg: currentColor;
+  --cbx-tree-label-focus-bg: rgb(from SelectedItem r g b / 0.2);
+  --cbx-tree-label-focus-fg: currentColor;
 
   &::part(item) {
     --line-color: rgb(from currentColor r g b / 0.3);
