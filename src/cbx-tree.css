@@ -110,6 +110,11 @@
   }
 }
 
+[part='toggle'],
+[part='title'] {
+  forced-color-adjust: preserve-parent-color;
+}
+
 :where([part='item']) [part='tree'] {
   grid-area: tree;
   padding-inline-start: var(--cbx-tree-nesting-indent);
