@@ -255,7 +255,7 @@ Validation-related methods [`checkValidity()`](https://developer.mozilla.org/en-
 
 ### `CbxTree.filter()`
 
-This method can be used to “filter” the tree by hiding those items that don’t meet custom criteria. The method accepts a single argument, a preficate function. The predicate is passed an object argument with item’s `title` and `value` as properties, and the return value must be `true` if the item passes the filter and `false` otherwise. It should be noted that if an item passes the filter, its *descendants* remain visible even if they themselves don’t satisfy the filtering condition.
+This method can be used to “filter” the tree by hiding those items that don’t meet custom criteria. The method accepts a single argument, a predicate function. The predicate is passed an object argument with item’s `title` and `value` as properties, and the return value must be `true` if the item passes the filter and `false` otherwise. It should be noted that if an item passes the filter, its *descendants* remain visible even if they themselves don’t satisfy the filtering condition.
 
 ```javascript
 const readingList = document.querySelector('[name="reading-list[]"]');
