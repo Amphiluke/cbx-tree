@@ -17,9 +17,10 @@
 </head>
 <body>
   <h1><code>&lt;cbx-tree&gt;</code>: The Checkbox Tree element</h1>
-  <form action="." id="archive-form" class="archive-form">
+  <form action="." id="archive-form" class="archive-form" autocomplete="off">
     <div class="archive-head">
       <h2>Select files/directories</h2>
+      <input type="search" id="filter" placeholder="Filter the tree">
       <button type="button" id="toggle-all-btn" title="Expand/collapse all">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="1lh" height="1lh" fill="currentColor">
           <path d="M3.65 9.15a.5.5 0 0 1 .7 0L8 12.79l3.65-3.64a.5.5 0 0 1 .7.7l-4 4a.5.5 0 0 1-.7 0l-4-4a.5.5 0 0 1 0-.7m0-2.3a.5.5 0 0 0 .7 0L8 3.21l3.65 3.64a.5.5 0 0 0 .7-.7l-4-4a.5.5 0 0 0-.7 0l-4 4a.5.5 0 0 0 0 .7"/>
@@ -46,5 +47,6 @@
   </footer>
   <script type="module" src="./cbx-tree.mjs"></script>
   <script type="module" src="./index.mjs"></script>
+  <script type="module" src="./filtering.mjs"></script>
 </body>
 </html>

@@ -46,17 +46,37 @@ button {
 }
 
 .archive-head {
-  align-items: baseline;
+  align-items: center;
   display: flex;
   gap: 0.8ch;
+
+  h2 {
+    flex-shrink: 0;
+  }
 
   button {
     align-items: center;
     display: flex;
     justify-content: center;
+  }
 
-    &:first-of-type {
+  [type='search'] {
+    flex: 0 1 400px;
+    height: 1.8lh;
+    margin-inline-start: auto;
+  }
+
+  @media (width < 600px) {
+    flex-wrap: wrap;
+
+    button:first-of-type {
       margin-inline-start: auto;
+    }
+
+    [type='search'] {
+      flex-grow: 1;
+      margin: 0;
+      order: 1;
     }
   }
 }

@@ -28,3 +28,16 @@ customElements.whenDefined('cbx-tree').then(() => {
   `);
   cbxTree.subtreeProvider = document.querySelector('[name="tree2[]"]').subtreeProvider = subtreeProvider;
 });
+
+let timer = null;
+document.getElementById('filter').addEventListener('input', ({target}) => {
+  if (timer) {
+    return;
+  }
+  timer = setTimeout(() => {
+    timer = null;
+    const query = target.value.trim().toLocaleLowerCase();
+    const predicate = query.length ? ({title}) => title.toLocaleLowerCase().includes(query) : () => true;
+    document.querySelector('cbx-tree[name="reading-list[]"]').filter(predicate);
+  }, 100);
+});

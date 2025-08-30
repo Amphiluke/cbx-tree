@@ -131,6 +131,20 @@ export class Tree {
   }
 
   /**
+   * Iterate over the tree
+   * @param {(item: CbxTreeItem) => void} callback 
+   * @param {CbxTreeMap} [tree]
+   */
+  walkTree(callback, tree = this.#tree) {
+    tree.forEach((item) => {
+      callback(item);
+      if (item.children) {
+        this.walkTree(callback, item.children);
+      }
+    });
+  }
+
+  /**
    * Convert internal representation of a tree back to its raw format
    * @param {CbxTreeMap} tree
    * @returns {CbxRawTreeItem[]}

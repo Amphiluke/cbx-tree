@@ -34,6 +34,7 @@ export default class CbxTree extends HTMLElement {
   toJSON(): CbxRawTreeItem[];
   toggleChecked(checked?: boolean): void;
   toggle(isExpanding?: boolean): void;
+  filter(predicate: ({title: string, value: string}) => boolean): void;
 
   get validity(): ValidityState;
   get validationMessage(): string;

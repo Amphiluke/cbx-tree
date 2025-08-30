@@ -562,6 +562,17 @@ export default class CbxTree extends HTMLElement {
     this.#refreshFormValue();
   }
 
+  /**
+   * Apply a filter to the tree, hiding items that don’t satisfy a user-defined condition
+   * @param {({title: string, value: string}) => boolean} predicate 
+   */
+  filter(predicate) {
+    this.#tree.walkTree((item) => {
+      const matches = predicate({title: item.title, value: item.value});
+      this.#shadowRoot.getElementById(`item_${item.id}`).hidden = !matches;
+    });
+  }
+
 
   // === Form validation ===
 

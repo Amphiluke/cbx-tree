@@ -2,15 +2,22 @@ html {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
 }
+
+.filter {
+  margin-inline-start: 10px;
+  width: 593px;
+}
+
 [name="reading-list[]"] {
   border: 1px solid;
-  margin: 20px 10px 80px;
+  margin: 10px 10px 80px;
   height: 450px;
   overflow: auto;
   padding: 8px;
   scrollbar-width: thin;
   width: 575px;
 }
+
 .trees {
   display: grid;
   gap: 1em;

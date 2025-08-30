@@ -40,7 +40,8 @@
     "tree   tree";
   grid-template-columns: max(1em, 16px) 1fr;
 
-  &[aria-expanded='false'] > [part='tree'] {
+  &[aria-expanded='false'] > [part='tree'],
+  &[hidden]:not(:has([part='item']:not([hidden])), [part='item']:not([hidden]) [part='item']) {
     display: none;
   }
 }

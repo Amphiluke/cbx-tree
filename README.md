@@ -253,6 +253,20 @@ The `CbxTree` interface also inherits methods from its parent, [HTMLElement](htt
 
 Validation-related methods [`checkValidity()`](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals/checkValidity), [`reportValidity()`](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals/reportValidity), and [`setValidity()`](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals/setValidity) are transparently exposed from the underlying `ElementInternals` object which allows the `<cbx-tree>` element participate in form validation.
 
+### `CbxTree.filter()`
+
+This method can be used to “filter” the tree by hiding those items that don’t meet custom criteria. The method accepts a single argument, a preficate function. The predicate is passed an object argument with item’s `title` and `value` as properties, and the return value must be `true` if the item passes the filter and `false` otherwise. It should be noted that if an item passes the filter, its *descendants* remain visible even if they themselves don’t satisfy the filtering condition.
+
+```javascript
+const readingList = document.querySelector('[name="reading-list[]"]');
+const filterInput = document.getElementById('filter');
+filterInput.addEventListener('input', () => {
+  const query = filterInput.value.trim().toLocaleLowerCase();
+  const predicate = query.length ? ({title}) => title.toLocaleLowerCase().includes(query) : () => true;
+  readingList.filter(predicate);
+});
+```
+
 ### `CbxTree.setData()`
 
 The `setData()` method is used for complete overwriting and rerendering the entire tree. It accepts a single argument, a new [tree data](#tree-data-structure). All existing changes will be lost and replaced by the newly provided data after calling this method. See an example in the [Usage notes](#usage-notes) section.
