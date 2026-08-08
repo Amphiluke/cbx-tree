@@ -564,7 +564,7 @@ export default class CbxTree extends HTMLElement {
 
   /**
    * Apply a filter to the tree, hiding items that don’t satisfy a user-defined condition
-   * @param {({title: string, value: string}) => boolean} predicate 
+   * @param {(item: {title: string, value: string}) => boolean} predicate 
    */
   filter(predicate) {
     this.#tree.walkTree((item) => {

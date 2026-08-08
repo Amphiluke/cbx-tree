@@ -1,5 +1,5 @@
 /*!
-cbx-tree v2.1.0
+cbx-tree v2.1.1
 https://amphiluke.github.io/cbx-tree/
 (c) 2026 Amphiluke
 */
